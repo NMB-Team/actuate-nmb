@@ -3,9 +3,9 @@
 
 import motion.actuators.GenericActuator;
 #if (flash || nme || openfl)
-import flash.display.DisplayObject;
-import flash.events.Event;
-import flash.Lib;
+import openfl.display.DisplayObject;
+import openfl.events.Event;
+import openfl.Lib;
 #elseif lime
 import lime.app.Application;
 import lime.system.System;
@@ -19,732 +19,475 @@ import haxe.PosInfos;
 import haxe.Timer;
 #end
 
-
 class SimpleActuator<T, U> extends GenericActuator<T> {
-	
-	
 	#if actuate_manual_time
-	public static var getTime:Void->Float;
+	public static var getTime:Void -> Float;
 	#end
-	
-	private var timeOffset:Float;
-	
-	private static var actuators = new Array<SimpleActuator<Dynamic, Dynamic>> ();
-	private static var actuatorsLength = 0;
-	private static var addedEvent = false;
-	
+
+	var timeOffset:Float;
+
+	static var actuators = new Array<SimpleActuator<Dynamic, Dynamic>>();
+	static var actuatorsLength = 0;
+	static var addedEvent = false;
+
 	#if (!flash && !nme && !openfl && !lime && !js)
-	private static var timer:Timer;
+	static var timer:Timer;
 	#end
-	
-	private var active:Bool;
-	private var cacheVisible:Bool;
-	private var detailsLength:Int;
-	private var initialized:Bool;
-	private var paused:Bool;
-	private var pauseTime:Float;
-	private var propertyDetails:Array <PropertyDetails<U>>;
-	private var sendChange:Bool;
-	private var setVisible:Bool;
-	private var startTime:Float;
-	private var toggleVisible:Bool;
-	
-	
-	public function new (target:T, duration:Float, properties:Dynamic) {
-		
+
+	var active:Bool;
+	var cacheVisible:Bool;
+	var detailsLength:Int;
+	var initialized:Bool;
+	var paused:Bool;
+	var pauseTime:Float;
+	var propertyDetails:Array<PropertyDetails<U>>;
+	var sendChange:Bool;
+	var setVisible:Bool;
+	var startTime:Float;
+	var toggleVisible:Bool;
+
+	public function new(target:T, duration:Float, properties:Dynamic) {
 		active = true;
-		propertyDetails = new Array ();
-		sendChange = false;
-		paused = false;
-		cacheVisible = false;
-		initialized = false;
-		setVisible = false;
-		toggleVisible = false;
-		
+		propertyDetails = new Array();
+		sendChange = paused = cacheVisible = initialized = setVisible = toggleVisible = false;
+
 		#if !actuate_manual_time
 			#if (flash || nme || openfl)
-			startTime = Lib.getTimer () / 1000;
+			startTime = Lib.getTimer() * .001;
 			#elseif lime
-			startTime = System.getTimer () / 1000;
+			startTime = System.getTimer() * .001;
 			#elseif js
-			startTime = Browser.window.performance.now () / 1000;
+			startTime = Browser.window.performance.now() * .001;
 			#else
-			startTime = Timer.stamp ();
+			startTime = Timer.stamp();
 			#end
 		#else
 		startTime = getTime();
 		#end
-		
-		super (target, duration, properties);
-		
+
+		super(target, duration, properties);
+
 		if (!addedEvent) {
-			
 			addedEvent = true;
 			#if !actuate_manual_update
 				#if (flash || nme || openfl)
-				Lib.current.stage.addEventListener (Event.ENTER_FRAME, stage_onEnterFrame);
+				Lib.current.stage.addEventListener(Event.ENTER_FRAME, stage_onEnterFrame);
 				#elseif lime
-				Application.current.onUpdate.add (stage_onEnterFrame);
+				Application.current.onUpdate.add(stage_onEnterFrame);
 				#elseif js
 				Browser.window.requestAnimationFrame(stage_onEnterFrame);
 				#else
-				timer = new Timer (Std.int(1000 / 30));
+				timer = new Timer(Std.int(1000 / 30));
 				timer.run = stage_onEnterFrame;
 				#end
 			#end
 		}
-		
 	}
-	
+
 	//For instant transition to start state without shaking
-	override public function reverse(?value:Null<Bool>):GenericActuator<T> 
-	{
-		var ga = super.reverse(value);
-		
-		
-		var startTime:Float = 0;
+	override public function reverse(?value:Null<Bool>):GenericActuator<T> {
+		final ga = super.reverse(value);
+
+		var startTime = .0;
 		#if !actuate_manual_time
 			#if (flash || nme || openfl)
-			startTime = Lib.getTimer () / 1000;
+			startTime = Lib.getTimer() * .001;
 			#elseif lime
-			startTime = System.getTimer () / 1000;
+			startTime = System.getTimer() * .001;
 			#elseif js
-			startTime = Browser.window.performance.now () / 1000;
+			startTime = Browser.window.performance.now() * .001;
 			#else
-			startTime = Timer.stamp ();
+			startTime = Timer.stamp();
 			#end
 		#else
 		startTime = getTime();
 		#end
-		
-		
+
 		update(startTime);
-		
-		
+
 		return ga;
 	}
-	
+
 	/**
 	 * @inheritDoc
 	 */
-	private override function apply ():Void {
-		
+	override function apply():Void {
 		super.apply();
-		
+
 		if (toggleVisible && Reflect.hasField (properties, "alpha")) {
-			
-			if (getField (target, "visible") != null) {
-				
-				setField (target, "visible", Reflect.field (properties, "alpha") > 0);
-				
-			}
-			
+			if (getField(target, "visible") != null)
+				setField(target, "visible", Reflect.field(properties, "alpha") > 0);
 		}
-		
 	}
-	
-	
+
 	/**
 	 * @inheritDoc
 	 */
-	public override function autoVisible (?value:Null<Bool>):GenericActuator<T> {
-		
-		if (value == null) {
-			
-			value = true;
-			
-		}
-		
+	public override function autoVisible(?value:Null<Bool>):GenericActuator<T> {
+		if (value == null) value = true;
+
 		_autoVisible = value;
-		
+
 		if (!value) {
-			
 			toggleVisible = false;
-			
-			if (setVisible) {
-				
-				setField (target, "visible", cacheVisible);
-				
-			}
-			
+			if (setVisible) setField(target, "visible", cacheVisible);
 		}
-		
+
 		return this;
-		
 	}
-	
-	
+
 	/**
 	 * @inheritDoc
 	 */
-	public override function delay (duration:Float):GenericActuator<T> {
-		
+	public override function delay(duration:Float):GenericActuator<T> {
 		_delay = duration;
 		timeOffset = startTime + duration;
-		
+
 		return this;
-		
 	}
-	
-	
-	private inline function getField<V> (target:V, propertyName:String):Dynamic {
-		
+
+	inline function getField<V>(target:V, propertyName:String):Dynamic {
 		#if (haxe_209 || haxe3)
-		
 		var value = null;
-		
-		if (Reflect.hasField (target, propertyName)) {
-			
+
+		if (Reflect.hasField(target, propertyName)) {
 			#if flash
 			value = untyped target[propertyName];
 			#else
-			value = Reflect.field (target, propertyName);
+			value = Reflect.field(target, propertyName);
 			#end
-			
-		} else {
-			
-			value = Reflect.getProperty (target, propertyName);
-			
-		}
-		
+		} else value = Reflect.getProperty(target, propertyName);
+
 		return value;
-		
 		#else
-		
-		return Reflect.field (target, propertyName);
-		
+		return Reflect.field(target, propertyName);
 		#end
-		
 	}
-	
-	
-	private function initialize ():Void {
-		
+
+	private function initialize():Void {
 		var details:PropertyDetails<U>;
 		var start:Dynamic;
-		
-		for (i in Reflect.fields (properties)) {
-			
+
+		for (i in Reflect.fields(properties)) {
 			var isField = true;
-			
+
 			#if (haxe_209 || haxe3)
-			
 			#if (!neko && !hl)
-			if (Reflect.hasField (target, i) #if flash && !untyped (target).hasOwnProperty ("set_" + i) #elseif js && !(untyped (target).__properties__ && untyped (target).__properties__["set_" + i]) #end) {
-				
-				start = Reflect.field (target, i);
-				
-			} else
+			if (Reflect.hasField(target, i) #if flash && !untyped(target).hasOwnProperty ("set_" + i) #elseif js && !(untyped(target).__properties__ && untyped(target).__properties__["set_" + i]) #end)
+				start = Reflect.field(target, i);
+			else
 			#end
 			{
-				
 				isField = false;
-				start = Reflect.getProperty (target, i);
-				
+				start = Reflect.getProperty(target, i);
 			}
-			
 			#else
-			
-			start = Reflect.field (target, i);
-			
+			start = Reflect.field(target, i);
 			#end
-			
+
 			if (#if (haxe_ver >= 4.2) Std.isOfType #else Std.is #end (start, Float)) {
-				
-				var value:Dynamic = getField (properties, i);
-				
+				var value:Dynamic = getField(properties, i);
+
 				#if (neko || js)
 				if (start == null) start = 0;
 				if (value == null) value = 0;
 				#end
-				
-				details = new PropertyDetails (cast target, i, start, value - start, isField);
-				propertyDetails.push (details);
-				
+
+				details = new PropertyDetails(cast target, i, start, value - start, isField);
+				propertyDetails.push(details);
 			}
-			
 		}
-		
+
 		detailsLength = propertyDetails.length;
 		initialized = true;
-		
 	}
-	
-	
-	private override function move ():Void {
-		
+
+	override function move():Void {
 		#if (flash || nme || openfl)
-		toggleVisible = (Reflect.hasField (properties, "alpha") && #if (haxe_ver >= 4.2) Std.isOfType #else Std.is #end (target, DisplayObject));
+		toggleVisible = (Reflect.hasField(properties, "alpha") && #if (haxe_ver >= 4.2) Std.isOfType #else Std.is #end (target, DisplayObject));
 		#else
-		toggleVisible = (Reflect.hasField (properties, "alpha") && Reflect.hasField (properties, "visible"));
+		toggleVisible = (Reflect.hasField(properties, "alpha") && Reflect.hasField(properties, "visible"));
 		#end
-		
-		if (toggleVisible && properties.alpha != 0 && !getField (target, "visible")) {
-			
+
+		if (toggleVisible && properties.alpha != 0 && !getField(target, "visible")) {
 			setVisible = true;
-			cacheVisible = getField (target, "visible");
-			setField (target, "visible", true);
-			
+			cacheVisible = getField(target, "visible");
+			setField(target, "visible", true);
 		}
-		
+
 		timeOffset = startTime;
-		actuators.push (this);
+		actuators.push(this);
 		++actuatorsLength;
-		
 	}
-	
-	
+
 	/**
 	 * @inheritDoc
 	 */
-	public override function onUpdate (handler:Dynamic, parameters:Array <Dynamic> = null):GenericActuator<T> {
-		
+	public override function onUpdate(handler:Dynamic, parameters:Array <Dynamic> = null):GenericActuator<T> {
 		_onUpdate = handler;
-		
-		if (parameters == null) {
-			
-			_onUpdateParams = [];
-			
-		} else {
-			
-			_onUpdateParams = parameters;
-			
-		}
-		
+
+		if (parameters == null) _onUpdateParams = [];
+		else _onUpdateParams = parameters;
+
 		sendChange = true;
-		
+
 		return this;
-		
 	}
-	
-	
-	private override function pause ():Void {
-		
+
+	override function pause():Void {
 		if (!paused) {
-			
 			paused = true;
-			
+
 			super.pause();
-			
+
 			#if !actuate_manual_time
 				#if (flash || nme || openfl)
-				pauseTime = Lib.getTimer ();
+				pauseTime = Lib.getTimer();
 				#elseif lime
-				pauseTime = System.getTimer ();
+				pauseTime = System.getTimer();
 				#elseif js
-				pauseTime = Browser.window.performance.now ();
+				pauseTime = Browser.window.performance.now();
 				#else
-				pauseTime = Timer.stamp ();
+				pauseTime = Timer.stamp();
 				#end
 			#else
 			pauseTime = getTime();
 			#end
-			
 		}
-		
 	}
-	
-	
-	private override function resume ():Void {
-		
+
+	override function resume():Void {
 		if (paused) {
-			
 			paused = false;
-			
+
 			#if !actuate_manual_time
 				#if (flash || nme || openfl)
-				timeOffset += (Lib.getTimer () - pauseTime) / 1000;
+				timeOffset += (Lib.getTimer() - pauseTime) * .001;
 				#elseif lime
-				timeOffset += (System.getTimer () - pauseTime) / 1000;
+				timeOffset += (System.getTimer() - pauseTime) * .001;
 				#elseif js
-				timeOffset += (Browser.window.performance.now () - pauseTime) / 1000;
+				timeOffset += (Browser.window.performance.now() - pauseTime) * .001;
 				#else
-				timeOffset += (Timer.stamp () - pauseTime);
+				timeOffset += (Timer.stamp() - pauseTime);
 				#end
 			#else
 			timeOffset += (getTime() - pauseTime);
 			#end
-			
-			super.resume ();
-			
+
+			super.resume();
 		}
-		
 	}
-	
-	
-	#if !js @:generic #end private inline function setField<V> (target:V, propertyName:String, value:Dynamic):Void {
-		
-		if (Reflect.hasField (target, propertyName) #if flash && !untyped (target).hasOwnProperty ("set_" + propertyName) #elseif js && !(untyped (target).__properties__ && untyped (target).__properties__["set_" + propertyName]) #end) {
-			
+
+
+	#if !js @:generic #end inline function setField<V>(target:V, propertyName:String, value:Dynamic):Void {
+		if (Reflect.hasField(target, propertyName) #if flash && !untyped (target).hasOwnProperty("set_" + propertyName) #elseif js && !(untyped (target).__properties__ && untyped(target).__properties__["set_" + propertyName]) #end) {
 			#if flash
 			untyped target[propertyName] = value;
 			#else
-			Reflect.setField (target, propertyName, value);
+			Reflect.setField(target, propertyName, value);
 			#end
-			
 		} else {
-			
 			#if (haxe_209 || haxe3)
-			Reflect.setProperty (target, propertyName, value);
+			Reflect.setProperty(target, propertyName, value);
 			#end
-			
 		}
-		
 	}
-	
-	
-	private function setProperty (details:PropertyDetails<U>, value:Dynamic):Void {
-		
+
+	private function setProperty(details:PropertyDetails<U>, value:Dynamic):Void {
 		if (details.isField) {
-			
 			#if flash
 			untyped details.target[details.propertyName] = value;
 			#else
-			Reflect.setField (details.target, details.propertyName, value);
+			Reflect.setField(details.target, details.propertyName, value);
 			#end
-			
 		} else {
-			
 			#if (haxe_209 || haxe3)
-			Reflect.setProperty (details.target, details.propertyName, value);
+			Reflect.setProperty(details.target, details.propertyName, value);
 			#end
-			
 		}
-		
 	}
-	
-	
-	private override function stop (properties:Dynamic, complete:Bool, sendEvent:Bool):Void {
-		
+
+	override function stop(properties:Dynamic, complete:Bool, sendEvent:Bool):Void {
 		if (active) {
-			
 			if (properties == null) {
-				
 				active = false;
-				
-				if (complete) {
-					
-					apply ();
-					
-				}
-				
-				this.complete (sendEvent);
+
+				if (complete) apply();
+
+				this.complete(sendEvent);
 				return;
-				
 			}
-			
-			for (i in Reflect.fields (properties)) {
-				
-				if (Reflect.hasField (this.properties, i)) {
-					
+
+			for (i in Reflect.fields(properties)) {
+				if (Reflect.hasField(this.properties, i)) {
 					active = false;
-					
-					if (complete) {
-						
-						apply ();
-						
-					}
-					
-					this.complete (sendEvent);
+
+					if (complete) apply();
+
+					this.complete(sendEvent);
 					return;
-					
 				}
-				
 			}
-			
 		}
-		
 	}
-	
-	
-	private function update (currentTime:Float):Void {
-		
+
+	private function update(currentTime:Float):Void {
 		if (!paused) {
-			
 			var details:PropertyDetails<U>;
 			var easing:Float;
 			var i:Int;
-			
-			var tweenPosition:Float = (currentTime - timeOffset) / duration;
-			
-			if (tweenPosition > 1) {
-				
-				tweenPosition = 1;
-				
-			}
-			
-			if (!initialized) {
-				
-				initialize ();
-				
-			}
-			
+
+			var tweenPosition = (currentTime - timeOffset) / duration;
+
+			if (tweenPosition > 1) tweenPosition = 1;
+			if (!initialized) initialize();
+
 			if (!special) {
-				
-				easing = _ease.calculate (tweenPosition);
-				
+				easing = _ease.calculate(tweenPosition);
+
 				for (i in 0...detailsLength) {
-					
 					details = propertyDetails[i];
-					setProperty (details, details.start + (details.change * easing));
-					
+					setProperty(details, details.start + (details.change * easing));
 				}
-				
 			} else {
-				
-				if (!_reverse) {
-					
-					easing = _ease.calculate (tweenPosition);
-					
-				} else {
-					
-					easing = _ease.calculate (1 - tweenPosition);
-					
-				}
-				
+				easing = !_reverse ? _ease.calculate(tweenPosition) : _ease.calculate(1 - tweenPosition);
+
 				var endValue:Float;
-				
+
 				for (i in 0...detailsLength) {
-					
 					details = propertyDetails[i];
-					
+
 					if (_smartRotation && (details.propertyName == "rotation" || details.propertyName == "rotationX" || details.propertyName == "rotationY" || details.propertyName == "rotationZ")) {
-						
-						var rotation:Float = details.change % 360;
-						
-						if (rotation > 180) {
-							
-							rotation -= 360;
-							
-						} else if (rotation < -180) {
-							
-							rotation += 360;
-							
-						}
-						
+						var rotation = details.change % 360;
+
+						if (rotation > 180) rotation -= 360;
+						else if (rotation < -180) rotation += 360;
+
 						endValue = details.start + rotation * easing;
-						
-					} else {
-						
-						endValue = details.start + (details.change * easing);
-						
-					}
-					
-					if (!_snapping) {
-						
-						setProperty (details, endValue);
-						
-					} else {
-						
-						setProperty (details, Math.round (endValue));
-						
-					}
-					
+					} else endValue = details.start + (details.change * easing);
+
+					if (!_snapping) setProperty(details, endValue);
+					else setProperty(details, Math.round(endValue));
 				}
-				
 			}
-			
+
 			if (tweenPosition == 1) {
-				
 				if (_repeat == 0) {
-					
 					active = false;
-					
-					if (toggleVisible && getField (target, "alpha") == 0) {
-						
-						setField (target, "visible", false);
-						
-					}
-					
-					complete (true);
+
+					if (toggleVisible && getField(target, "alpha") == 0)
+						setField(target, "visible", false);
+
+					complete(true);
 					return;
-					
 				} else {
-					
-					if (_onRepeat != null) {
-						
-						callMethod (_onRepeat, _onRepeatParams);
-						
-					}
-					
-					if (_reflect) {
-						
-						_reverse = !_reverse;
-						
-					}
-					
+					if (_onRepeat != null) callMethod(_onRepeat, _onRepeatParams);
+
+					if (_reflect) _reverse = !_reverse;
+
 					startTime = currentTime;
 					timeOffset = startTime + _delay;
-					
-					if (_repeat > 0) {
-						
-						_repeat --;
-						
-					}
-					
+
+					if (_repeat > 0) _repeat--;
 				}
-				
 			}
-			
-			if (sendChange) {
-				
-				change ();
-				
-			}
-			
+
+			if (sendChange) change();
 		}
-		
 	}
-	
-	
-	
-	
+
 	// Event Handlers
-	
-	
-	#if actuate_manual_update 
-	public 
-	#else 
-	private 
-	#end
-	static function stage_onEnterFrame (#if (flash || nme || openfl) event:Event #elseif lime deltaTime:Int #elseif js deltaTime:Float #end):Void {
+	#if actuate_manual_update public #end static function stage_onEnterFrame(#if (flash || nme || openfl) event:Event #elseif lime deltaTime:Int #elseif js deltaTime:Float #end):Void {
 		#if !actuate_manual_time
 			#if (flash || nme || openfl)
-			var currentTime:Float = Lib.getTimer () / 1000;
+			final currentTime:Float = Lib.getTimer() * .001;
 			#elseif lime
-			var currentTime = System.getTimer () / 1000;
+			final currentTime = System.getTimer() * .001;
 			#elseif js
-			var currentTime = deltaTime / 1000;
+			final currentTime = deltaTime * .001;
 			#else
-			var currentTime = Timer.stamp ();
+			final currentTime = Timer.stamp();
 			#end
 		#else
-			var currentTime = getTime ();
+			final currentTime = getTime();
 		#end
-		
+
 		var actuator:SimpleActuator<Dynamic, Dynamic>;
-		
-		var j:Int = 0;
-		var cleanup = false;
-		
+
+		var j = 0;
+
 		for (i in 0...actuatorsLength) {
-			
 			actuator = actuators[j];
-			
+
 			if (actuator != null && actuator.active) {
-				
-				if (currentTime >= actuator.timeOffset) {
-					
-					actuator.update (currentTime);
-					
-				}
-				
+				if (currentTime >= actuator.timeOffset)
+					actuator.update(currentTime);
 				j++;
-				
 			} else {
-				
-				actuators.splice (j, 1);
+				actuators.splice(j, 1);
 				--actuatorsLength;
-				
 			}
-			
 		}
-		
+
 		#if (!flash && !nme && !openfl && !lime && !actuate_manual_update && js)
 		Browser.window.requestAnimationFrame(stage_onEnterFrame);
 		#end
-		
 	}
-	
-	
 }
-
 
 #if ((cpp || neko) && (!openfl && !lime && !nme))
 
 // Custom haxe.Timer implementation for C++ and Neko
-
-typedef TimerList = Array <Timer>;
-
+typedef TimerList = Array<Timer>;
 
 class Timer {
-	
-	
-	static var sRunningTimers:TimerList = [];
-	
+	static var sRunningTimers = new Array<TimerList>();
+
 	var mTime:Float;
 	var mFireAt:Float;
 	var mRunning:Bool;
-	
-	
-	public function new (time:Float) {
-		
+
+	public function new(time:Float) {
 		mTime = time;
 		sRunningTimers.push (this);
-		mFireAt = GetMS () + mTime;
+		mFireAt = GetMS() + mTime;
 		mRunning = true;
-		
 	}
-	
-	
-	public static function measure<T>( f : Void -> T, ?pos : haxe.PosInfos ) : T {
-		var t0 = stamp();
-		var r = f();
+
+	public static function measure<T>(f:Void -> T, ?pos:haxe.PosInfos):T {
+		final t0 = stamp();
+		final r = f();
 		haxe.Log.trace((stamp() - t0) + "s", pos);
 		return r;
 	}
-	
-	
-	// Set this with "run=..."
-	dynamic public function run () {
-		
-		
-		
-	}
-   
-	
-	public function stop ():Void {
-		
+
+	dynamic public function run () {} // Set this with "run=..."
+
+	public function stop():Void {
 		if (mRunning) {
-			
 			mRunning = false;
-			sRunningTimers.remove (this);
-			
+			sRunningTimers.remove(this);
 		}
-		
 	}
-	
-	
-	static function GetMS ():Float {
-		
-		return stamp () * 1000.0;
-		
-	}
-	
 
-   // From std/haxe/Timer.hx
-	public static function delay (f:Void -> Void, time:Int) {
-		
-		var t = new Timer (time);
-		
-		t.run = function () {
-			t.stop ();
-			f ();
+	static function GetMS():Float {
+		return stamp() * 1000;
+	}
+
+  	// From std/haxe/Timer.hx
+	public static function delay(f:Void -> Void, time:Int) {
+		final t = new Timer(time);
+
+		t.run = () -> {
+			t.stop();
+			f();
 		};
-		
+
 		return t;
-		
 	}
-	
-	
-	static public function stamp ():Float {
-		
-		return Date.now().getTime ();
-		
+
+	public static function stamp():Float {
+		return Date.now().getTime();
 	}
-	
-	
 }
-
-
 #end

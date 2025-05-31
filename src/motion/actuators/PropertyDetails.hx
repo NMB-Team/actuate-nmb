@@ -7,7 +7,7 @@ class PropertyDetails<T> {
 	public var start:Float;
 	public var target:T;
 
-	public function new (target:T, propertyName:String, start:Float, change:Float, isField = true):Void {
+	public function new(target:T, propertyName:String, start:Float, change:Float, isField = true):Void {
 		this.target = target;
 		this.propertyName = propertyName;
 		this.start = start;

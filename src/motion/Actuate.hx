@@ -11,7 +11,7 @@ import motion.actuators.TransformActuator;
 import motion.easing.Expo;
 import motion.easing.IEasing;
 
-#if (flash || nme || openfl)
+#if openfl
 import openfl.display.DisplayObject;
 #end
 
@@ -27,10 +27,6 @@ class Actuate {
 	public static var defaultEase:IEasing = Expo.easeOut;
 
 	static var targetLibraries = new ObjectMap<Dynamic, Array<IGenericActuator>>();
-
-	#if neko
-	static var methodLibraries = new FunctionMap<Dynamic, Array<IGenericActuator>>();
-	#end
 
 	/**
 	 * Copies properties from one object to another. Conflicting tweens are stopped automatically
@@ -51,7 +47,7 @@ class Actuate {
 		return actuator;
 	}
 
-	#if (flash || nme || openfl)
+	#if openfl
 	/**
 	 * Creates a new effects tween
 	 * @param	target		The object to tween
@@ -65,17 +61,8 @@ class Actuate {
 	#end
 
 	static function getLibrary<T>(target:T, allowCreation = true):Array<IGenericActuator> {
-		#if neko
-		if (Reflect.isFunction (target)) {
-			if (!methodLibraries.exists(target) && allowCreation)
-				methodLibraries.set(target, new Array<IGenericActuator> ());
-
-			return methodLibraries.get (target);
-		}
-		#end
-
 		if (!targetLibraries.exists(target) && allowCreation)
-			targetLibraries.set(target, new Array<IGenericActuator> ());
+			targetLibraries.set(target, new Array<IGenericActuator>());
 
 		return targetLibraries.get(target);
 	}
@@ -108,10 +95,10 @@ class Actuate {
 
 	/**
 	 * Pauses tweens for the specified target objects
-	 * @param	... targets		The target objects which will have their tweens paused. Passing no value pauses tweens for all objects
+	 * @param	... targets	The target objects which will have their tweens paused. Passing no value pauses tweens for all objects
 	 */
 	public static function pause<T>(target:T):Void {
-		if (#if (haxe_ver >= 4.2) Std.isOfType #else Std.is #end (target, IGenericActuator)) {
+		if (Std.isOfType(target, IGenericActuator)) {
 			final actuator:IGenericActuator = cast target;
 			actuator.pause();
 		} else {
@@ -123,13 +110,10 @@ class Actuate {
 		}
 	}
 
+	/**
+	 * Pauses all tweens for all objects
+	 */
 	public static function pauseAll():Void {
-		#if neko
-		for (library in methodLibraries)
-			for (actuator in library)
-				actuator.pause();
-		#end
-
 		for (library in targetLibraries)
 			for (actuator in library)
 				actuator.pause();
@@ -139,17 +123,6 @@ class Actuate {
 	 * Resets Actuate by stopping and removing tweens for all objects
 	 */
 	public static function reset():Void {
-		#if neko
-		for (library in methodLibraries) {
-			var i = library.length - 1;
-			while (i >= 0) {
-				library[i].stop(null, false, false);
-				i--;
-			}
-		}
-		methodLibraries = new FunctionMap<Dynamic, Array<IGenericActuator>>();
-		#end
-
 		for (library in targetLibraries) {
 			var i = library.length - 1;
 			while (i >= 0) {
@@ -166,7 +139,7 @@ class Actuate {
 	 * @param	... targets		The target objects which will have their tweens resumed. Passing no value resumes tweens for all objects
 	 */
 	public static function resume<T>(target:T):Void {
-		if (#if (haxe_ver >= 4.2) Std.isOfType #else Std.is #end (target, IGenericActuator)) {
+		if (Std.isOfType(target, IGenericActuator)) {
 			final actuator:IGenericActuator = cast target;
 			actuator.resume();
 		} else {
@@ -178,13 +151,10 @@ class Actuate {
 		}
 	}
 
+	/**
+	 * Resumes all paused tweens for all objects
+	 */
 	public static function resumeAll():Void {
-		#if neko
-		for (library in methodLibraries)
-			for (actuator in library)
-				actuator.resume();
-		#end
-
 		for (library in targetLibraries)
 			for (actuator in library)
 				actuator.resume();
@@ -199,17 +169,17 @@ class Actuate {
 	 */
 	public static function stop<T>(target:T, properties:Dynamic = null, complete = false, sendEvent = true):Void {
 		if (target != null) {
-			if (#if (haxe_ver >= 4.2) Std.isOfType #else Std.is #end (target, IGenericActuator)) {
+			if (Std.isOfType(target, IGenericActuator)) {
 				final actuator:IGenericActuator = cast target;
 				actuator.stop(null, complete, sendEvent);
 			} else {
 				final library = getLibrary(target, false);
 				if (library != null) {
-					if (#if (haxe_ver >= 4.2) Std.isOfType #else Std.is #end (properties, String)) {
+					if (Std.isOfType(properties, String)) {
 						final temp = {};
 						Reflect.setField(temp, properties, null);
 						properties = temp;
-					} else if (#if (haxe_ver >= 4.2) Std.isOfType #else Std.is #end (properties, Array)) {
+					} else if (Std.isOfType(properties, Array)) {
 						final temp = {};
 
 						for (property in cast (properties, Array <Dynamic>))
@@ -220,7 +190,7 @@ class Actuate {
 
 					var i = library.length - 1;
 					while (i >= 0) {
-						library[i].stop (properties, complete, sendEvent);
+						library[i].stop(properties, complete, sendEvent);
 						i--;
 					}
 				}
@@ -239,7 +209,7 @@ class Actuate {
 		return cast tween(new TweenTimer(0), duration, new TweenTimer(1), false, cast customActuator);
 	}
 
-	#if (flash || nme || openfl)
+	#if openfl
 	/**
 	 * Creates a new transform tween
 	 * @example		<code>Actuate.transform (MyClip, 1).color (0xFF0000);</code>
@@ -248,7 +218,7 @@ class Actuate {
 	 * @param	overwrite		Sets whether previous tweens for the same target and properties will be overwritten (Default is true)
 	 * @return		A TransformOptions instance, which is used to select the kind of transform you would like to apply to the target
 	 */
-	public static function transform<T> (target:T, duration = .0, overwrite = true):TransformOptions<T> {
+	public static function transform<T>(target:T, duration = .0, overwrite = true):TransformOptions<T> {
 		return new TransformOptions(target, duration, overwrite);
 	}
 	#end
@@ -296,23 +266,10 @@ class Actuate {
 	public static function unload<T>(actuator:GenericActuator<T>):Void {
 		final target = actuator.target;
 
-		#if neko
-		if (Reflect.isFunction(target)) {
-			if (methodLibraries.exists(target)) {
-				methodLibraries.get(target).remove(actuator);
-
-				if (methodLibraries.get(target).length == 0)
-					methodLibraries.remove(target);
-			}
-
-			return;
-		}
-		#end
-
-		if (targetLibraries.exists (target)) {
+		if (targetLibraries.exists(target)) {
 			targetLibraries.get(target).remove(actuator);
 
-			if (targetLibraries.get (target).length == 0)
+			if (targetLibraries.get(target).length == 0)
 				targetLibraries.remove(target);
 		}
 	}
@@ -344,11 +301,10 @@ import com.eclecticdesignstudio.motion.actuators.TransformActuator;
 import com.eclecticdesignstudio.motion.Actuate;
 import openfl.display.DisplayObject;
 import openfl.filters.BitmapFilter;
-//import openfl.filters.ColorMatrixFilter;
 import openfl.geom.Matrix;
 #end
 
-#if (flash || nme || openfl)
+#if openfl
 class EffectsOptions {
 	var duration:Float;
 	var overwrite:Bool;
@@ -425,73 +381,3 @@ class TweenTimer {
 		this.progress = progress;
 	}
 }
-
-#if neko
-class KVPairMap<K, V> {
-	var keyList:Array<K>;
-	var valList:Array<V>;
-
-	public function new() {
-		this.keyList = [];
-		this.valList = [];
-	}
-
-	private function equals(k1:K, k2:K):Bool
-		return throw 'base';
-
-	private function indexOf(k:K):Int {
-		for (i in 0...keyList.length)
-			if (equals(k, keyList[i]))
-				return i;
-		return -1;
-	}
-
-	public function get(k:K):Null<V>
-		return valList[indexOf(k)];
-
-	public function set(k:K, v:V):V {
-		var i = indexOf(k);
-		if (i == -1) {
-			keyList.push(k);
-			valList.push(v);
-		}
-		else {
-			keyList[i] = k;
-			valList[i] = v;
-		}
-		return v;
-	}
-
-	public function exists(k:K):Bool
-		return indexOf(k) != -1;
-
-	public function remove(k:K):Bool {
-		final i = indexOf(k);
-		return
-			if (i == -1) false;
-			else {
-				keyList.splice(i, 1);
-				valList.splice(i, 1);
-				true;
-			}
-	}
-
-	public inline function keys():Iterator<K>{
-		return keyList.iterator();
-	}
-
-	public inline function iterator():Iterator<V> {
-		return valList.iterator();
-	}
-
-	public function toString() {
-		return [for (i in 0...keyList.length) Std.string(keyList[i]) => valList[i]].toString();
-	}
-}
-
-class FunctionMap<K, V> extends KVPairMap<K, V> {
-	override function equals(k1:K, k2:K):Bool {
-		return Reflect.compareMethods(k1, k2);
-	}
-}
-#end

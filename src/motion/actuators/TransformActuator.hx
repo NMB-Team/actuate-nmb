@@ -1,6 +1,6 @@
 ﻿package motion.actuators;
 
-#if (flash || nme || openfl)
+#if openfl
 import openfl.display.DisplayObject;
 import openfl.display.Sprite;
 import openfl.geom.ColorTransform;
@@ -29,7 +29,7 @@ class TransformActuator<T> extends SimpleActuator<T, Dynamic> {
 	}
 
 	override function initialize():Void {
-		if (Reflect.hasField(properties, "colorValue") && #if (haxe_ver >= 4.2) Std.isOfType #else Std.is #end (target, DisplayObject)) initializeColor();
+		if (Reflect.hasField(properties, "colorValue") && Std.isOfType(target, DisplayObject)) initializeColor();
 		if (Reflect.hasField(properties, "soundVolume") || Reflect.hasField(properties, "soundPan")) initializeSound();
 
 		detailsLength = propertyDetails.length;

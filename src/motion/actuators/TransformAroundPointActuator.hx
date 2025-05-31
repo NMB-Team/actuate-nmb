@@ -1,25 +1,29 @@
 ﻿package motion.actuators;
 
-#if (flash || nme || openfl)
-import openfl.display.DisplayObject;
+#if openfl
 import Reflect;
+import openfl.display.DisplayObject;
 import openfl.geom.Matrix;
 import openfl.geom.Point;
 
 class TransformAroundPointActuator<T, U> extends SimpleActuator<T, U> {
 	var transformMatrix:Matrix;
+
 	var transformPoint:Point;
 	var initialTransformPoint:Point;
 	var transformedPoint:Point;
+
 	var originX:Float;
 	var originY:Float;
 	var tweenedOffsetX:Float;
 	var tweenedOffsetY:Float;
 
-	public function new (target:T, duration:Float, properties:Dynamic) {
+	public function new(target:T, duration:Float, properties:Dynamic) {
 		super(target, duration, properties);
+
 		transformedPoint = new Point();
 		transformMatrix = new Matrix();
+
 		originX = getField(target, "x");
 		originY = getField(target, "y");
 
@@ -29,7 +33,7 @@ class TransformAroundPointActuator<T, U> extends SimpleActuator<T, U> {
 				case "point":
 					final point = Reflect.field(transformAroundPointProps, "point");
 					final isLocal = Reflect.hasField(transformAroundPointProps, "pointIsLocal") && Reflect.field (transformAroundPointProps, "pointIsLocal");
-					if (#if (haxe_ver >= 4.2) Std.isOfType #else Std.is #end (target, DisplayObject) && !isLocal) transformPoint = Reflect.callMethod(target,  Reflect.field(target, "globalToLocal"), [point]);
+					if (Std.isOfType(target, DisplayObject) && !isLocal) transformPoint = Reflect.callMethod(target,  Reflect.field(target, "globalToLocal"), [point]);
 					else transformPoint = point;
 				case "scale":
 					final value = Reflect.field(transformAroundPointProps, "scale");
@@ -64,13 +68,14 @@ class TransformAroundPointActuator<T, U> extends SimpleActuator<T, U> {
 
 	override function setProperty(details:PropertyDetails<U>, value:Dynamic):Void {
 		final propertyName = details.propertyName;
+
 		if (propertyName == "x") tweenedOffsetX = value - originX;
 		else if (propertyName == "y") tweenedOffsetY = value - originY;
 		else super.setProperty(details, value);
 	}
 
-	override function update(currentTime:Float):Void {
-		super.update(currentTime);
+	override function update(elapsed:Float):Void {
+		super.update(elapsed);
 
 		if (active && !paused) updatePosition();
 	}

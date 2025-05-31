@@ -45,6 +45,7 @@ class BounceEaseOut implements IEasing {
 	static final B4 = 2.5 / 2.75;
 	static final B5 = 2.25 / 2.75;
 	static final B6 = 2.625 / 2.75;
+	static final B7 = 7.5625;
 
 	public function new() {}
 
@@ -58,12 +59,12 @@ class BounceEaseOut implements IEasing {
 
 	public static inline function _ease(t:Float, b:Float, c:Float, d:Float):Float {
 		if ((t /= d) < B1)
-			return c * (7.5625 * t * t) + b;
+			return c * (B7 * t * t) + b;
 		else if (t < B2)
-			return c * (7.5625 * (t -= B3) * t + .75) + b;
+			return c * (B7 * (t -= B3) * t + .75) + b;
 		else if (t < B4)
-			return c * (7.5625 * (t -= B5) * t + .9375) + b;
+			return c * (B7 * (t -= B5) * t + .9375) + b;
 		else
-			return c * (7.5625 * (t -= B6) * t + .984375) + b;
+			return c * (B7 * (t -= B6) * t + .984375) + b;
 	}
 }

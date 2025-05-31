@@ -12,9 +12,9 @@ class MotionPath {
 	#if commonjs
 	static function __init__() {
 		untyped Object.defineProperties (MotionPath.prototype, {
-			"rotation": { get: untyped __js__ ("function () { return this.get_rotation (); }") },
-			"x": { get: untyped __js__ ("function () { return this.get_x (); }") },
-			"y": { get: untyped __js__ ("function () { return this.get_y (); }") },
+			"rotation": {get: untyped __js__ ("function () { return this.get_rotation (); }")},
+			"x": {get: untyped __js__ ("function () { return this.get_x (); }")},
+			"y": {get: untyped __js__ ("function () { return this.get_y (); }")},
 		});
 	}
 	#end
@@ -63,8 +63,8 @@ class MotionPath {
 	 * @return		The current motion path instance
 	 */
 	public function bezierSpline(x:Array<Float>, y:Array<Float>, strength = 1.):MotionPath {
-		_x.addPath(new BezierSplinePath (x, strength));
-		_y.addPath(new BezierSplinePath (y, strength));
+		_x.addPath(new BezierSplinePath(x, strength));
+		_y.addPath(new BezierSplinePath(y, strength));
 
 		return this;
 	}
@@ -83,7 +83,7 @@ class MotionPath {
 	// Get & Set Methods
 	@:noCompletion inline function get_rotation():RotationPath {
 		if (_rotation == null)
-			_rotation = new RotationPath (_x, _y);
+			_rotation = new RotationPath(_x, _y);
 
 		return _rotation;
 	}
@@ -155,8 +155,8 @@ class ComponentPath implements IComponentPath {
 
 interface IComponentPath {
 	var start(get, set):Float;
-	var end(get, null):Float;
-	public var strength:Float;
+	var end(get, never):Float;
+	var strength:Float;
 
 	function calculate(k:Float):Float;
 }
@@ -164,13 +164,13 @@ interface IComponentPath {
 class BezierPath implements IComponentPath {
 	public var control:Array<Float>;
 	public var start(get, set):Float;
-	public var end(get, null):Float;
+	public var end(get, never):Float;
 	public var strength:Float;
 
 	var _start:Float;
 	var _end:Float;
 
-	public function new (end:Float, control:Array<Float>, strength:Float) {
+	public function new(end:Float, control:Array<Float>, strength:Float) {
 		this._end = end;
 		this.control = control;
 		this.strength = strength;
@@ -196,7 +196,7 @@ class BezierPath implements IComponentPath {
 
 				for (i in 1...n) {
 					coeff *= r * (n + 1 - i) / i; // compute coeff from its (i-1)-th value
-					res += coeff * control[i-1];
+					res += coeff * control[i - 1];
 				}
 				coeff *= r / n; // coeff now equals k^n
 				return res + coeff * _end;
@@ -220,7 +220,7 @@ class BezierPath implements IComponentPath {
 class BezierSplinePath extends ComponentPath {
 	public var through:Array<Float>;
 
-	public function new (through:Array<Float>, strength:Float) {
+	public function new(through:Array<Float>, strength:Float) {
 		// the whole path depends on the starting point, so we compute it in set_start
 		super();
 
@@ -232,14 +232,14 @@ class BezierSplinePath extends ComponentPath {
 		Compute the control points (cubic: 2 for each segment) of a smooth bezier spline
 		that starts at 'start' and passes through all 'through' points.
 		Code from: https://www.particleincell.com/wp-content/uploads/2012/06/bezier-spline.js
-		Explanation: http://www.particleincell.com/2012/bezier-splines/
-		With correction from: http://www.jacos.nl/jacos_html/spline/
+		Explanation: https://www.particleincell.com/2012/bezier-splines/
+		With correction from: https://www.jacos.nl/jacos_html/spline/
 	 **/
 	private function computeControlPoints(start:Float):Array<Array<Float>> {
 		final K = [start].concat(through);
 		var n = K.length;
 
-		final control = [ for(_ in 0...n) [.0, .0] ]; // 2 control points for each segment
+		final control = [for (_ in 0...n) [.0, .0]]; // 2 control points for each segment
 
 		// rhs vector
 		var a = new Array<Float>();
@@ -303,7 +303,7 @@ class BezierSplinePath extends ComponentPath {
 			paths.splice(0, paths.length);		// reset
 
 			for (i in 0...control.length)
-				addPath (new BezierPath (through[i], control[i], pathStrength));
+				addPath(new BezierPath(through[i], control[i], pathStrength));
 		}
 
 		return super.set_start(value);
@@ -316,8 +316,8 @@ class BezierSplinePath extends ComponentPath {
 }
 
 class RotationPath implements IComponentPath {
-	public var end (get, never):Float;
-	public var start (get, set):Float;
+	public var end(get, never):Float;
+	public var start(get, set):Float;
 	public var offset:Float;
 	public var strength:Float;
 
@@ -335,13 +335,10 @@ class RotationPath implements IComponentPath {
 	}
 
 	public function calculate(k:Float):Float {
-		final dX = _x.calculate (k) - _x.calculate (k + step);
-		final dY = _y.calculate (k) - _y.calculate (k + step);
+		final dX = _x.calculate(k) - _x.calculate(k + step);
+		final dY = _y.calculate(k) - _y.calculate(k + step);
 
-		var angle = Math.atan2(dY, dX) * 57.29577951308232;
-		angle = (angle + offset) % 360;
-
-		return angle;
+		return (Math.atan2(dY, dX) * 180 / Math.PI + offset) % 360;
 	}
 
 	// Get & Set Methods
@@ -350,7 +347,7 @@ class RotationPath implements IComponentPath {
 	}
 
 	public function set_start(value:Float):Float {
-		return _start;	// not modifiable
+		return _start; // not modifiable
 	}
 
 	public function get_end():Float {

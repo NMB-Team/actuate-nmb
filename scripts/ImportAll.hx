@@ -1,6 +1,5 @@
 package;
 
-
 import motion.actuators.FilterActuator;
 import motion.actuators.GenericActuator;
 import motion.actuators.MethodActuator;

@@ -2,7 +2,7 @@
 
 
 import motion.actuators.GenericActuator;
-#if (flash || nme || openfl)
+#if openfl
 import openfl.display.DisplayObject;
 import openfl.events.Event;
 import openfl.Lib;
@@ -12,10 +12,6 @@ import lime.system.System;
 #elseif js
 import js.Browser;
 #else
-#if neko
-import haxe.Log;
-import haxe.PosInfos;
-#end
 import haxe.Timer;
 #end
 
@@ -30,7 +26,7 @@ class SimpleActuator<T, U> extends GenericActuator<T> {
 	static var actuatorsLength = 0;
 	static var addedEvent = false;
 
-	#if (!flash && !nme && !openfl && !lime && !js)
+	#if (!openfl && !lime && !js)
 	static var timer:Timer;
 	#end
 
@@ -52,7 +48,7 @@ class SimpleActuator<T, U> extends GenericActuator<T> {
 		sendChange = paused = cacheVisible = initialized = setVisible = toggleVisible = false;
 
 		#if !actuate_manual_time
-			#if (flash || nme || openfl)
+			#if openfl
 			startTime = Lib.getTimer() * .001;
 			#elseif lime
 			startTime = System.getTimer() * .001;
@@ -70,7 +66,7 @@ class SimpleActuator<T, U> extends GenericActuator<T> {
 		if (!addedEvent) {
 			addedEvent = true;
 			#if !actuate_manual_update
-				#if (flash || nme || openfl)
+				#if openfl
 				Lib.current.stage.addEventListener(Event.ENTER_FRAME, stage_onEnterFrame);
 				#elseif lime
 				Application.current.onUpdate.add(stage_onEnterFrame);
@@ -85,12 +81,12 @@ class SimpleActuator<T, U> extends GenericActuator<T> {
 	}
 
 	//For instant transition to start state without shaking
-	override public function reverse(?value:Null<Bool>):GenericActuator<T> {
+	override function reverse(?value:Null<Bool>):GenericActuator<T> {
 		final ga = super.reverse(value);
 
 		var startTime = .0;
 		#if !actuate_manual_time
-			#if (flash || nme || openfl)
+			#if openfl
 			startTime = Lib.getTimer() * .001;
 			#elseif lime
 			startTime = System.getTimer() * .001;
@@ -123,7 +119,7 @@ class SimpleActuator<T, U> extends GenericActuator<T> {
 	/**
 	 * @inheritDoc
 	 */
-	public override function autoVisible(?value:Null<Bool>):GenericActuator<T> {
+	override function autoVisible(?value:Null<Bool>):GenericActuator<T> {
 		if (value == null) value = true;
 
 		_autoVisible = value;
@@ -139,7 +135,7 @@ class SimpleActuator<T, U> extends GenericActuator<T> {
 	/**
 	 * @inheritDoc
 	 */
-	public override function delay(duration:Float):GenericActuator<T> {
+	override function delay(duration:Float):GenericActuator<T> {
 		_delay = duration;
 		timeOffset = startTime + duration;
 
@@ -148,17 +144,7 @@ class SimpleActuator<T, U> extends GenericActuator<T> {
 
 	inline function getField<V>(target:V, propertyName:String):Dynamic {
 		#if (haxe_209 || haxe3)
-		var value = null;
-
-		if (Reflect.hasField(target, propertyName)) {
-			#if flash
-			value = untyped target[propertyName];
-			#else
-			value = Reflect.field(target, propertyName);
-			#end
-		} else value = Reflect.getProperty(target, propertyName);
-
-		return value;
+		return Reflect.hasField(target, propertyName) ? Reflect.field(target, propertyName) : Reflect.getProperty(target, propertyName);
 		#else
 		return Reflect.field(target, propertyName);
 		#end
@@ -172,8 +158,8 @@ class SimpleActuator<T, U> extends GenericActuator<T> {
 			var isField = true;
 
 			#if (haxe_209 || haxe3)
-			#if (!neko && !hl)
-			if (Reflect.hasField(target, i) #if flash && !untyped(target).hasOwnProperty ("set_" + i) #elseif js && !(untyped(target).__properties__ && untyped(target).__properties__["set_" + i]) #end)
+			#if !hl
+			if (Reflect.hasField(target, i) #if js && !(untyped(target).__properties__ && untyped(target).__properties__["set_" + i]) #end)
 				start = Reflect.field(target, i);
 			else
 			#end
@@ -185,10 +171,10 @@ class SimpleActuator<T, U> extends GenericActuator<T> {
 			start = Reflect.field(target, i);
 			#end
 
-			if (#if (haxe_ver >= 4.2) Std.isOfType #else Std.is #end (start, Float)) {
+			if (Std.isOfType(start, Float)) {
 				var value:Dynamic = getField(properties, i);
 
-				#if (neko || js)
+				#if js
 				if (start == null) start = 0;
 				if (value == null) value = 0;
 				#end
@@ -203,8 +189,8 @@ class SimpleActuator<T, U> extends GenericActuator<T> {
 	}
 
 	override function move():Void {
-		#if (flash || nme || openfl)
-		toggleVisible = (Reflect.hasField(properties, "alpha") && #if (haxe_ver >= 4.2) Std.isOfType #else Std.is #end (target, DisplayObject));
+		#if openfl
+		toggleVisible = (Reflect.hasField(properties, "alpha") && Std.isOfType(target, DisplayObject));
 		#else
 		toggleVisible = (Reflect.hasField(properties, "alpha") && Reflect.hasField(properties, "visible"));
 		#end
@@ -241,7 +227,7 @@ class SimpleActuator<T, U> extends GenericActuator<T> {
 			super.pause();
 
 			#if !actuate_manual_time
-				#if (flash || nme || openfl)
+				#if openfl
 				pauseTime = Lib.getTimer();
 				#elseif lime
 				pauseTime = System.getTimer();
@@ -261,7 +247,7 @@ class SimpleActuator<T, U> extends GenericActuator<T> {
 			paused = false;
 
 			#if !actuate_manual_time
-				#if (flash || nme || openfl)
+				#if openfl
 				timeOffset += (Lib.getTimer() - pauseTime) * .001;
 				#elseif lime
 				timeOffset += (System.getTimer() - pauseTime) * .001;
@@ -280,31 +266,25 @@ class SimpleActuator<T, U> extends GenericActuator<T> {
 
 
 	#if !js @:generic #end inline function setField<V>(target:V, propertyName:String, value:Dynamic):Void {
-		if (Reflect.hasField(target, propertyName) #if flash && !untyped (target).hasOwnProperty("set_" + propertyName) #elseif js && !(untyped (target).__properties__ && untyped(target).__properties__["set_" + propertyName]) #end) {
-			#if flash
-			untyped target[propertyName] = value;
-			#else
+		if (Reflect.hasField(target, propertyName) #if js && !(untyped (target).__properties__ && untyped(target).__properties__["set_" + propertyName]) #end) {
 			Reflect.setField(target, propertyName, value);
-			#end
-		} else {
-			#if (haxe_209 || haxe3)
-			Reflect.setProperty(target, propertyName, value);
-			#end
 		}
+		#if (haxe_209 || haxe3)
+		else {
+			Reflect.setProperty(target, propertyName, value);
+		}
+		#end
 	}
 
 	private function setProperty(details:PropertyDetails<U>, value:Dynamic):Void {
 		if (details.isField) {
-			#if flash
-			untyped details.target[details.propertyName] = value;
-			#else
 			Reflect.setField(details.target, details.propertyName, value);
-			#end
-		} else {
-			#if (haxe_209 || haxe3)
-			Reflect.setProperty(details.target, details.propertyName, value);
-			#end
 		}
+		#if (haxe_209 || haxe3)
+		else {
+			Reflect.setProperty(details.target, details.propertyName, value);
+		}
+		#end
 	}
 
 	override function stop(properties:Dynamic, complete:Bool, sendEvent:Bool):Void {
@@ -318,7 +298,7 @@ class SimpleActuator<T, U> extends GenericActuator<T> {
 				return;
 			}
 
-			for (i in Reflect.fields(properties)) {
+			for (i in Reflect.fields(properties))
 				if (Reflect.hasField(this.properties, i)) {
 					active = false;
 
@@ -327,7 +307,6 @@ class SimpleActuator<T, U> extends GenericActuator<T> {
 					this.complete(sendEvent);
 					return;
 				}
-			}
 		}
 	}
 
@@ -397,10 +376,10 @@ class SimpleActuator<T, U> extends GenericActuator<T> {
 	}
 
 	// Event Handlers
-	#if actuate_manual_update public #end static function stage_onEnterFrame(#if (flash || nme || openfl) event:Event #elseif lime deltaTime:Int #elseif js deltaTime:Float #end):Void {
+	#if actuate_manual_update public #end static function stage_onEnterFrame(#if openfl event:Event #elseif lime deltaTime:Int #elseif js deltaTime:Float #end):Void {
 		#if !actuate_manual_time
-			#if (flash || nme || openfl)
-			final currentTime:Float = Lib.getTimer() * .001;
+			#if openfl
+			final currentTime = Lib.getTimer() * .001;
 			#elseif lime
 			final currentTime = System.getTimer() * .001;
 			#elseif js
@@ -429,15 +408,15 @@ class SimpleActuator<T, U> extends GenericActuator<T> {
 			}
 		}
 
-		#if (!flash && !nme && !openfl && !lime && !actuate_manual_update && js)
+		#if (!openfl && !lime && !actuate_manual_update && js)
 		Browser.window.requestAnimationFrame(stage_onEnterFrame);
 		#end
 	}
 }
 
-#if ((cpp || neko) && (!openfl && !lime && !nme))
+#if (cpp && (!openfl && !lime))
 
-// Custom haxe.Timer implementation for C++ and Neko
+// Custom haxe.Timer implementation for C++
 typedef TimerList = Array<Timer>;
 
 class Timer {

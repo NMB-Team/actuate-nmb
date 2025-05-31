@@ -4,7 +4,7 @@ import motion.easing.IEasing;
 
 interface IGenericActuator {
 	/**
-	 * Flash performs faster when objects are set to visible = false rather than only alpha = 0. autoVisible toggles automatically based on alpha values
+	 * AutoVisible toggles automatically based on alpha values
 	 * @param	value		Whether autoVisible should be enabled (Default is true)
 	 * @return		The current actuator instance
 	 */

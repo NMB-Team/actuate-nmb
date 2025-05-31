@@ -46,7 +46,7 @@ class MethodActuator<T> extends SimpleActuator<T, T> {
 
 			Reflect.setField(tweenProperties, propertyName, start);
 
-			if (#if (haxe_ver >= 4.2) Std.isOfType #else Std.is #end (start, Float) || #if (haxe_ver >= 4.2) Std.isOfType #else Std.is #end (start, Int)) {
+			if (Std.isOfType(start, Float) || Std.isOfType(start, Int)) {
 				details = new PropertyDetails(tweenProperties, propertyName, start, properties.end[i] - start);
 				propertyDetails.push(details);
 			}

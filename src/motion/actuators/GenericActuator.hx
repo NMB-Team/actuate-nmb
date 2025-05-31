@@ -44,8 +44,8 @@ import motion.Actuate;
 	private function apply():Void {
 		for (i in Reflect.fields (properties)) {
 			#if (haxe_209 || haxe3)
-			if (#if flash false && #end Reflect.hasField(target, i)) Reflect.setField(target, i, Reflect.field(properties, i));
-			else  Reflect.setProperty(target, i, Reflect.field(properties, i));
+			if (Reflect.hasField(target, i)) Reflect.setField(target, i, Reflect.field(properties, i));
+			else Reflect.setProperty(target, i, Reflect.field(properties, i));
 			#else
 			Reflect.setField(target, i, Reflect.field(properties, i));
 			#end
@@ -53,7 +53,7 @@ import motion.Actuate;
 	}
 
 	/**
-	 * Flash performs faster when objects are set to visible = false rather than only alpha = 0. autoVisible toggles automatically based on alpha values
+	 * autoVisible toggles automatically based on alpha values
 	 * @param	value		Whether autoVisible should be enabled (Default is true)
 	 * @return		The current actuator instance
 	 */
@@ -67,14 +67,6 @@ import motion.Actuate;
 
 	private inline function callMethod(method:Dynamic, params:Array<Dynamic> = null):Dynamic {
 		if (params == null) params = [];
-
-		#if neko
-		final diff = untyped($nargs)(method) - params.length;
-		if (diff > 0) {
-			params = params.copy();
-			for (i in 0...diff)	params.push(null);
-		}
-		#end
 
 		return Reflect.callMethod(#if hl null #else method #end, method, params);
 	}

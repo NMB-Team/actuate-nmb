@@ -10,7 +10,7 @@ class MotionPathActuator<T> extends SimpleActuator<T, T> {
 	override function apply():Void {
 		for (propertyName in Reflect.fields(properties)) {
 			#if (haxe_209 || haxe3)
-			if (#if flash false && #end Reflect.hasField(target, propertyName)) Reflect.setField(target, propertyName, cast(Reflect.field(properties, propertyName), IComponentPath).end);
+			if (Reflect.hasField(target, propertyName)) Reflect.setField(target, propertyName, cast(Reflect.field(properties, propertyName), IComponentPath).end);
 			else Reflect.setProperty(target, propertyName, cast(Reflect.field(properties, propertyName), IComponentPath).end);
 			#else
 			Reflect.setField(target, propertyName, cast(Reflect.field(properties, propertyName), IComponentPath).end);
@@ -29,7 +29,7 @@ class MotionPathActuator<T> extends SimpleActuator<T, T> {
 				var isField = true;
 
 				#if (haxe_209 || haxe3)
-				#if (!flash && !neko && !hl)
+				#if !hl
 				if (Reflect.hasField(target, propertyName)) {
 					path.start = Reflect.field(target, propertyName);
 				} else

@@ -1,6 +1,6 @@
 ﻿package motion.actuators;
 
-#if (flash || nme || openfl)
+#if openfl
 import openfl.display.DisplayObject;
 import openfl.filters.BitmapFilter;
 
@@ -14,13 +14,13 @@ class FilterActuator extends SimpleActuator<DisplayObject, BitmapFilter> {
 
 		super(target, duration, properties);
 
-		if (#if (haxe_ver >= 4.2) Std.isOfType #else Std.is #end (properties.filter, Class)) {
+		if (Std.isOfType(properties.filter, Class)) {
 			filterClass = properties.filter;
 
 			if (target.filters.length == 0) target.filters = [Type.createInstance(filterClass, [])];
 
 			for (filter in target.filters)
-				if (#if (haxe_ver >= 4.2) Std.isOfType #else Std.is #end (filter, filterClass))
+				if (Std.isOfType(filter, filterClass))
 					this.filter = filter;
 		} else {
 			filterIndex = properties.filter;
@@ -58,7 +58,7 @@ class FilterActuator extends SimpleActuator<DisplayObject, BitmapFilter> {
 			filters[filterIndex] = filter;
 		} else {
 			for (i in 0...filters.length)
-				if (#if (haxe_ver >= 4.2) Std.isOfType #else Std.is #end (filters[i], filterClass))
+				if (Std.isOfType(filters[i], filterClass))
 					filters[i] = filter;
 		}
 

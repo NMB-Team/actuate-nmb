@@ -7,23 +7,23 @@ class MotionPathActuator<T> extends SimpleActuator<T, T> {
 		super(target, duration, properties);
 	}
 
-	private override function apply():Void {
+	override function apply():Void {
 		for (propertyName in Reflect.fields(properties)) {
 			#if (haxe_209 || haxe3)
-			if (#if flash false && #end Reflect.hasField(target, propertyName)) Reflect.setField(target, propertyName, cast (Reflect.field(properties, propertyName), IComponentPath).end);
-			else Reflect.setProperty(target, propertyName, cast (Reflect.field(properties, propertyName), IComponentPath).end);
+			if (#if flash false && #end Reflect.hasField(target, propertyName)) Reflect.setField(target, propertyName, cast(Reflect.field(properties, propertyName), IComponentPath).end);
+			else Reflect.setProperty(target, propertyName, cast(Reflect.field(properties, propertyName), IComponentPath).end);
 			#else
-			Reflect.setField(target, propertyName, cast (Reflect.field(properties, propertyName), IComponentPath).end);
+			Reflect.setField(target, propertyName, cast(Reflect.field(properties, propertyName), IComponentPath).end);
 			#end
 		}
 	}
 
-	private override function initialize():Void {
+	override function initialize():Void {
 		var details:PropertyPathDetails<T>;
 		var path:IComponentPath;
 
 		for (propertyName in Reflect.fields(properties)) {
-			path = cast (Reflect.field(properties, propertyName), IComponentPath);
+			path = cast(Reflect.field(properties, propertyName), IComponentPath);
 
 			if (path != null) {
 				var isField = true;
@@ -31,7 +31,7 @@ class MotionPathActuator<T> extends SimpleActuator<T, T> {
 				#if (haxe_209 || haxe3)
 				#if (!flash && !neko && !hl)
 				if (Reflect.hasField(target, propertyName)) {
-					path.start = Reflect.field (target, propertyName);
+					path.start = Reflect.field(target, propertyName);
 				} else
 				#end
 				{
@@ -51,7 +51,7 @@ class MotionPathActuator<T> extends SimpleActuator<T, T> {
 		initialized = true;
 	}
 
-	private override function update(currentTime:Float):Void {
+	override function update(currentTime:Float):Void {
 		if (!paused) {
 			var details:PropertyPathDetails<T>;
 			var easing:Float;
@@ -65,10 +65,10 @@ class MotionPathActuator<T> extends SimpleActuator<T, T> {
 				easing = _ease.calculate(tweenPosition);
 
 				for (details in propertyDetails) {
-					if (details.isField) Reflect.setField(details.target, details.propertyName, cast (details, PropertyPathDetails<Dynamic>).path.calculate(easing));
+					if (details.isField) Reflect.setField(details.target, details.propertyName, cast(details, PropertyPathDetails<Dynamic>).path.calculate(easing));
 					else {
 						#if (haxe_209 || haxe3)
-						Reflect.setProperty(details.target, details.propertyName, cast (details, PropertyPathDetails<Dynamic>).path.calculate(easing));
+						Reflect.setProperty(details.target, details.propertyName, cast(details, PropertyPathDetails<Dynamic>).path.calculate(easing));
 						#end
 					}
 				}
@@ -77,17 +77,17 @@ class MotionPathActuator<T> extends SimpleActuator<T, T> {
 
 				for (details in propertyDetails) {
 					if (!_snapping) {
-						if (details.isField) Reflect.setField(details.target, details.propertyName, cast (details, PropertyPathDetails<Dynamic>).path.calculate(easing));
+						if (details.isField) Reflect.setField(details.target, details.propertyName, cast(details, PropertyPathDetails<Dynamic>).path.calculate(easing));
 						else {
 							#if (haxe_209 || haxe3)
-							Reflect.setProperty(details.target, details.propertyName, cast (details, PropertyPathDetails<Dynamic>).path.calculate(easing));
+							Reflect.setProperty(details.target, details.propertyName, cast(details, PropertyPathDetails<Dynamic>).path.calculate(easing));
 							#end
 						}
 					} else {
-						if (details.isField) Reflect.setField(details.target, details.propertyName, Math.round(cast (details, PropertyPathDetails<Dynamic>).path.calculate(easing)));
+						if (details.isField) Reflect.setField(details.target, details.propertyName, Math.round(cast(details, PropertyPathDetails<Dynamic>).path.calculate(easing)));
 						else {
 							#if (haxe_209 || haxe3)
-							Reflect.setProperty(details.target, details.propertyName, Math.round(cast (details, PropertyPathDetails<Dynamic>).path.calculate(easing)));
+							Reflect.setProperty(details.target, details.propertyName, Math.round(cast(details, PropertyPathDetails<Dynamic>).path.calculate(easing)));
 							#end
 						}
 					}
@@ -101,7 +101,7 @@ class MotionPathActuator<T> extends SimpleActuator<T, T> {
 					if (toggleVisible && getField(target, "alpha") == 0)
 						setField(target, "visible", false);
 
-					complete (true);
+					complete(true);
 					return;
 				} else {
 					if (_onRepeat != null) callMethod(_onRepeat, _onRepeatParams);

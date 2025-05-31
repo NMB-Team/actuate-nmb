@@ -100,9 +100,9 @@ interface IGenericActuator {
 	public function onResume(handler:Dynamic, ?parameters:Array<Dynamic>):IGenericActuator;
 
 	//private var properties:Dynamic;
-	function apply():Void;
-	function move():Void;
-	function pause():Void;
-	function resume():Void;
-	function stop(properties:Dynamic, complete:Bool, sendEvent:Bool):Void;
+	private function apply():Void;
+	private function move():Void;
+	private function pause():Void;
+	private function resume():Void;
+	private function stop(properties:Dynamic, complete:Bool, sendEvent:Bool):Void;
 }

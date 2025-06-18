@@ -6,14 +6,13 @@
 
 ### the best library for animating Haxe projects. Power through your everyday needs using no-nonsense, lightweight tweens, then extend when you need more, through the swappable custom actuator system
 #
-### ⚠️ This library does not support `flash`, `nme`, or `neko` targets.
-
-For best compatibility and performance, we recommend using the latest stable version of Haxe.
-
-If you need those, please use the [original version](https://github.com/openfl/actuate) of the library instead.
-#
 
 </div>
+
+> [!WARNING]
+> This library does not support `flash`, `nme`, or `neko` targets. <br/>
+> For best compatibility and performance, we recommend using the latest stable version of Haxe. <br/>
+> If you need those, please use the [original version](https://github.com/openfl/actuate) of the library instead. <br/>
 
 ## Installation
 

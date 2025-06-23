@@ -4,6 +4,9 @@ import motion.easing.IEasing;
 import motion.Actuate;
 
 @:keepSub class GenericActuator<T> implements IGenericActuator {
+	public var timeScale(get, set):Float;
+
+	var _timeScale = 1.;
 	var duration:Float;
 	var id:String;
 	var properties:Dynamic;
@@ -29,6 +32,8 @@ import motion.Actuate;
 	var special:Bool;
 
 	public function new(target:T, duration:Float, properties:Dynamic) {
+		_timeScale = Actuate.timeScale;
+
 		_autoVisible = true;
 		_delay = 0;
 		_repeat = 0;
@@ -256,4 +261,12 @@ import motion.Actuate;
 	}
 
 	private function stop(properties:Dynamic, complete:Bool, sendEvent:Bool):Void {}
+
+	@:noCompletion inline function get_timeScale():Float {
+		return _timeScale;
+	}
+
+	@:noCompletion inline function set_timeScale(value:Float):Float {
+		return _timeScale = value;
+	}
 }

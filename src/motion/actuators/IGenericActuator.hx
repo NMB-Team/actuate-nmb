@@ -99,6 +99,8 @@ interface IGenericActuator {
 	 */
 	public function onResume(handler:Dynamic, ?parameters:Array<Dynamic>):IGenericActuator;
 
+	public var timeScale(get, set):Float;
+
 	//private var properties:Dynamic;
 	private function apply():Void;
 	private function move():Void;

@@ -316,7 +316,7 @@ class SimpleActuator<T, U> extends GenericActuator<T> {
 			var easing:Float;
 			var i:Int;
 
-			var tweenPosition = (currentTime - timeOffset) / duration;
+			var tweenPosition = (currentTime - timeOffset) * _timeScale / duration;
 
 			if (tweenPosition > 1) tweenPosition = 1;
 			if (!initialized) initialize();
@@ -376,7 +376,7 @@ class SimpleActuator<T, U> extends GenericActuator<T> {
 	}
 
 	// Event Handlers
-	#if actuate_manual_update public #end static function stage_onEnterFrame(#if openfl event:Event #elseif lime deltaTime:Int #elseif js deltaTime:Float #end):Void {
+	#if actuate_manual_update public #end static function stage_onEnterFrame(#if openfl event:Event #elseif lime deltaTime:Float #elseif js deltaTime:Float #end):Void {
 		#if !actuate_manual_time
 			#if openfl
 			final currentTime = Lib.getTimer() * .001;

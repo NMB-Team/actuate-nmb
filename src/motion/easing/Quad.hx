@@ -26,12 +26,14 @@ class QuadEaseInOut implements IEasing {
 	public function new() {}
 
 	public function calculate(k:Float):Float {
-		if ((k *= 2) < 1) return 1 * .5 * k * k;
+		if ((k *= 2) < 1)
+			return 1 * .5 * k * k;
 		return -1 * .5 * ((k - 1) * (k - 3) - 1);
 	}
 
 	public function ease(t:Float, b:Float, c:Float, d:Float):Float {
-		if ((t /= d * .5) < 1) return c * .5 * t * t + b;
+		if ((t /= d * .5) < 1)
+			return c * .5 * t * t + b;
 		return -c * .5 * ((t - 1) * (t - 3) - 1) + b;
 	}
 }

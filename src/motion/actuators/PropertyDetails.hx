@@ -1,4 +1,4 @@
-﻿package motion.actuators;
+package motion.actuators;
 
 class PropertyDetails<T> {
 	public var change:Float;

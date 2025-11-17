@@ -27,12 +27,14 @@ class QuintEaseInOut implements IEasing {
 	public function new() {}
 
 	public function calculate(k:Float):Float {
-		if ((k *= 2) < 1) return .5 * k * k * k * k * k;
+		if ((k *= 2) < 1)
+			return .5 * k * k * k * k * k;
 		return .5 * ((k -= 2) * k * k * k * k + 2);
 	}
 
 	public function ease(t:Float, b:Float, c:Float, d:Float):Float {
-		if ((t /= d * .5) < 1) return c * .5 * t * t * t * t * t + b;
+		if ((t /= d * .5) < 1)
+			return c * .5 * t * t * t * t * t + b;
 		return c * .5 * ((t -= 2) * t * t * t * t + 2) + b;
 	}
 }

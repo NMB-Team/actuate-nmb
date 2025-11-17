@@ -1,4 +1,4 @@
-﻿package motion.easing;
+package motion.easing;
 
 /**
  * @author Joshua Granick
@@ -6,11 +6,11 @@
  * @author Robert Penner / http://www.robertpenner.com/easing_terms_of_use.html
  */
 class Back {
-	public static var easeIn(default, null):IEasing = new BackEaseIn (1.70158);
-	public static var easeInOut(default, null):IEasing = new BackEaseInOut (1.70158);
-	public static var easeOut(default, null):IEasing = new BackEaseOut (1.70158);
+	public static var easeIn(default, null):IEasing = new BackEaseIn(1.70158);
+	public static var easeInOut(default, null):IEasing = new BackEaseInOut(1.70158);
+	public static var easeOut(default, null):IEasing = new BackEaseOut(1.70158);
 
-	public static function easeInWith (s:Float):IEasing {
+	public static function easeInWith(s:Float):IEasing {
 		return new BackEaseIn(s);
 	}
 
@@ -47,12 +47,14 @@ class BackEaseInOut implements IEasing {
 	}
 
 	public function calculate(k:Float):Float {
-		if ((k /= .5) < 1) return .5 * (k * k * (((s) + 1) * k - s));
+		if ((k /= .5) < 1)
+			return .5 * (k * k * (((s) + 1) * k - s));
 		return .5 * ((k -= 2) * k * (((s) + 1) * k + s) + 2);
 	}
 
 	public function ease(t:Float, b:Float, c:Float, d:Float):Float {
-		if ((t /= d * .5) < 1) return c * .5 * (t * t * ((s + 1) * t - s)) + b;
+		if ((t /= d * .5) < 1)
+			return c * .5 * (t * t * ((s + 1) * t - s)) + b;
 		return c * .5 * ((t -= 2) * t * ((s + 1) * t + s) + 2) + b;
 	}
 }

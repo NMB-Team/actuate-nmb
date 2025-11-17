@@ -1,4 +1,4 @@
-﻿package motion.actuators;
+package motion.actuators;
 
 import motion.easing.IEasing;
 import motion.Actuate;
@@ -47,10 +47,12 @@ import motion.Actuate;
 	}
 
 	private function apply():Void {
-		for (i in Reflect.fields (properties)) {
+		for (i in Reflect.fields(properties)) {
 			#if (haxe_209 || haxe3)
-			if (Reflect.hasField(target, i)) Reflect.setField(target, i, Reflect.field(properties, i));
-			else Reflect.setProperty(target, i, Reflect.field(properties, i));
+			if (Reflect.hasField(target, i))
+				Reflect.setField(target, i, Reflect.field(properties, i));
+			else
+				Reflect.setProperty(target, i, Reflect.field(properties, i));
 			#else
 			Reflect.setField(target, i, Reflect.field(properties, i));
 			#end
@@ -63,7 +65,8 @@ import motion.Actuate;
 	 * @return		The current actuator instance
 	 */
 	public function autoVisible(?value:Null<Bool>):GenericActuator<T> {
-		if (value == null) value = true;
+		if (value == null)
+			value = true;
 
 		_autoVisible = value;
 
@@ -71,13 +74,15 @@ import motion.Actuate;
 	}
 
 	private inline function callMethod(method:Dynamic, params:Array<Dynamic> = null):Dynamic {
-		if (params == null) params = [];
+		if (params == null)
+			params = [];
 
 		return Reflect.callMethod(#if hl null #else method #end, method, params);
 	}
 
 	private function change():Void {
-		if (_onUpdate != null) callMethod(_onUpdate, _onUpdateParams);
+		if (_onUpdate != null)
+			callMethod(_onUpdate, _onUpdateParams);
 	}
 
 	private function complete(sendEvent = true):Void {
@@ -123,7 +128,8 @@ import motion.Actuate;
 		_onComplete = handler;
 		_onCompleteParams = (parameters == null) ? [] : parameters;
 
-		if (duration == 0) complete();
+		if (duration == 0)
+			complete();
 
 		return this;
 	}
@@ -181,7 +187,8 @@ import motion.Actuate;
 	}
 
 	private function pause():Void {
-		if (_onPause == null) return;
+		if (_onPause == null)
+			return;
 		callMethod(_onPause, _onPauseParams);
 	}
 
@@ -191,7 +198,8 @@ import motion.Actuate;
 	 * @return		The current actuator instance
 	 */
 	public function reflect(?value:Null<Bool>):GenericActuator<T> {
-		if (value == null) value = true;
+		if (value == null)
+			value = true;
 
 		_reflect = value;
 		special = true;
@@ -205,16 +213,17 @@ import motion.Actuate;
 	 * @return		The current actuator instance
 	 */
 	public function repeat(?times:Null<Int>):GenericActuator<T> {
-		if (times == null) times = -1;
+		if (times == null)
+			times = -1;
 
 		_repeat = times;
 
 		return this;
 	}
 
-
 	private function resume():Void {
-		if (_onResume == null) return;
+		if (_onResume == null)
+			return;
 		callMethod(_onResume, _onResumeParams);
 	}
 
@@ -224,7 +233,8 @@ import motion.Actuate;
 	 * @return		The current actuator instance
 	 */
 	public function reverse(?value:Null<Bool>):GenericActuator<T> {
-		if (value == null) value = true;
+		if (value == null)
+			value = true;
 
 		_reverse = value;
 		special = true;
@@ -238,7 +248,8 @@ import motion.Actuate;
 	 * @return		The current actuator instance
 	 */
 	public function smartRotation(?value:Null<Bool>):GenericActuator<T> {
-		if (value == null) value = true;
+		if (value == null)
+			value = true;
 
 		_smartRotation = value;
 		special = true;
@@ -252,7 +263,8 @@ import motion.Actuate;
 	 * @return		The current actuator instance
 	 */
 	public function snapping(?value:Null<Bool>):GenericActuator<T> {
-		if (value == null) value = true;
+		if (value == null)
+			value = true;
 
 		_snapping = value;
 		special = true;

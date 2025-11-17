@@ -1,6 +1,7 @@
-﻿package motion;
+package motion;
 
 import haxe.ds.ObjectMap;
+
 import motion.actuators.FilterActuator;
 import motion.actuators.GenericActuator;
 import motion.actuators.IGenericActuator;
@@ -36,10 +37,11 @@ class Actuate {
 	 * @param	customActuator		A custom actuator to use instead of the default (Optional)
 	 * @return		The current actuator instance, which can be used to apply properties like onComplete or onUpdate handlers
 	 */
-	public static function apply<T> (target:T, properties:Dynamic, customActuator:Class<GenericActuator<T>> = null):GenericActuator<T> {
+	public static function apply<T>(target:T, properties:Dynamic, customActuator:Class<GenericActuator<T>> = null):GenericActuator<T> {
 		stop(target, properties);
 
-		if (customActuator == null) customActuator = cast defaultActuator;
+		if (customActuator == null)
+			customActuator = cast defaultActuator;
 
 		final actuator:GenericActuator<T> = Type.createInstance(customActuator, [target, 0, properties]);
 		actuator.apply();
@@ -197,7 +199,7 @@ class Actuate {
 					} else if (Std.isOfType(properties, Array)) {
 						final temp = {};
 
-						for (property in cast (properties, Array <Dynamic>))
+						for (property in cast(properties, Array<Dynamic>))
 							Reflect.setField(temp, property, null);
 
 						properties = temp;
@@ -272,7 +274,8 @@ class Actuate {
 				actuator.move();
 
 				return actuator;
-			} else return apply(target, properties, customActuator);
+			} else
+				return apply(target, properties, customActuator);
 		}
 
 		return null;
@@ -299,7 +302,7 @@ class Actuate {
 	 * @param	overwrite		Sets whether previous tweens for the same target and properties will be overwritten (Default is true)
 	 * @return		The current actuator instance, which can be used to apply properties like ease, delay, onComplete or onUpdate
 	 */
-	public static function update<T>(target:T, duration:Float, start:Array <Dynamic> = null, end:Array <Dynamic> = null, overwrite = true):GenericActuator<T> {
+	public static function update<T>(target:T, duration:Float, start:Array<Dynamic> = null, end:Array<Dynamic> = null, overwrite = true):GenericActuator<T> {
 		final properties:Dynamic = {
 			start: start,
 			end: end
@@ -314,6 +317,7 @@ import com.eclecticdesignstudio.motion.actuators.FilterActuator;
 import com.eclecticdesignstudio.motion.actuators.GenericActuator;
 import com.eclecticdesignstudio.motion.actuators.TransformActuator;
 import com.eclecticdesignstudio.motion.Actuate;
+
 import openfl.display.DisplayObject;
 import openfl.filters.BitmapFilter;
 import openfl.geom.Matrix;
@@ -367,7 +371,8 @@ class TransformOptions<T> {
 			colorStrength: strength
 		};
 
-		if (alpha != null) properties.colorAlpha = alpha;
+		if (alpha != null)
+			properties.colorAlpha = alpha;
 
 		return Actuate.tween(target, duration, properties, overwrite, TransformActuator);
 	}
@@ -381,8 +386,10 @@ class TransformOptions<T> {
 	public function sound(volume:Null<Float> = null, pan:Null<Float> = null):IGenericActuator {
 		final properties:Dynamic = {};
 
-		if (volume != null) properties.soundVolume = volume;
-		if (pan != null) properties.soundPan = pan;
+		if (volume != null)
+			properties.soundVolume = volume;
+		if (pan != null)
+			properties.soundPan = pan;
 
 		return Actuate.tween(target, duration, properties, overwrite, TransformActuator);
 	}

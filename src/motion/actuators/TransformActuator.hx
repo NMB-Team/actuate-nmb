@@ -1,4 +1,4 @@
-﻿package motion.actuators;
+package motion.actuators;
 
 #if openfl
 import openfl.display.DisplayObject;
@@ -25,12 +25,15 @@ class TransformActuator<T> extends SimpleActuator<T, Dynamic> {
 			setField(transform, "colorTransform", endColorTransform);
 		}
 
-		if (endSoundTransform != null) setField(target, "soundTransform", endSoundTransform);
+		if (endSoundTransform != null)
+			setField(target, "soundTransform", endSoundTransform);
 	}
 
 	override function initialize():Void {
-		if (Reflect.hasField(properties, "colorValue") && Std.isOfType(target, DisplayObject)) initializeColor();
-		if (Reflect.hasField(properties, "soundVolume") || Reflect.hasField(properties, "soundPan")) initializeSound();
+		if (Reflect.hasField(properties, "colorValue") && Std.isOfType(target, DisplayObject))
+			initializeColor();
+		if (Reflect.hasField(properties, "soundVolume") || Reflect.hasField(properties, "soundPan"))
+			initializeSound();
 
 		detailsLength = propertyDetails.length;
 		initialized = true;
@@ -67,12 +70,20 @@ class TransformActuator<T> extends SimpleActuator<T, Dynamic> {
 			endColorTransform.blueOffset = (color & 0xFF);
 		}
 
-		final propertyNames = ["redMultiplier", "greenMultiplier", "blueMultiplier", "redOffset", "greenOffset", "blueOffset"];
+		final propertyNames = [
+			"redMultiplier",
+			"greenMultiplier",
+			"blueMultiplier",
+			"redOffset",
+			"greenOffset",
+			"blueOffset"
+		];
 
 		if (Reflect.hasField(properties, "colorAlpha")) {
 			endColorTransform.alphaMultiplier = properties.colorAlpha;
 			propertyNames.push("alphaMultiplier");
-		} else endColorTransform.alphaMultiplier = getField(target, "alpha");
+		} else
+			endColorTransform.alphaMultiplier = getField(target, "alpha");
 
 		final transform:Transform = getField(target, "transform");
 		final begin:ColorTransform = getField(transform, "colorTransform");
@@ -89,7 +100,8 @@ class TransformActuator<T> extends SimpleActuator<T, Dynamic> {
 	}
 
 	private function initializeSound():Void {
-		if (getField(target, "soundTransform") == null) setField(target, "soundTransform", new SoundTransform());
+		if (getField(target, "soundTransform") == null)
+			setField(target, "soundTransform", new SoundTransform());
 
 		final start:SoundTransform = getField(target, "soundTransform");
 		endSoundTransform = getField(target, "soundTransform");
@@ -114,7 +126,8 @@ class TransformActuator<T> extends SimpleActuator<T, Dynamic> {
 			setField(transform, "colorTransform", tweenColorTransform);
 		}
 
-		if (endSoundTransform != null) setField(target, "soundTransform", tweenSoundTransform);
+		if (endSoundTransform != null)
+			setField(target, "soundTransform", tweenSoundTransform);
 	}
 }
 #end

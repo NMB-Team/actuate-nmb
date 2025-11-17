@@ -54,7 +54,7 @@ class BounceEaseOut implements IEasing {
 	}
 
 	public function ease(t:Float, b:Float, c:Float, d:Float):Float {
-		return BounceEaseOut._ease(t,b,c,d);
+		return BounceEaseOut._ease(t, b, c, d);
 	}
 
 	public static inline function _ease(t:Float, b:Float, c:Float, d:Float):Float {

@@ -1,5 +1,4 @@
-﻿package motion.actuators;
-
+package motion.actuators;
 
 class MethodActuator<T> extends SimpleActuator<T, T> {
 	var currentParameters:Array<Dynamic>;
@@ -55,7 +54,6 @@ class MethodActuator<T> extends SimpleActuator<T, T> {
 		detailsLength = propertyDetails.length;
 		initialized = true;
 	}
-
 
 	override function update(currentTime:Float):Void {
 		super.update(currentTime);

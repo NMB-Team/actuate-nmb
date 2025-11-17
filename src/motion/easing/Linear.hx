@@ -10,13 +10,13 @@ class Linear {
 }
 
 class LinearEaseNone implements IEasing {
-	public function new () {}
+	public function new() {}
 
-	public function calculate (k:Float):Float {
+	public function calculate(k:Float):Float {
 		return k;
 	}
 
-	public function ease (t:Float, b:Float, c:Float, d:Float):Float {
+	public function ease(t:Float, b:Float, c:Float, d:Float):Float {
 		return c * t / d + b;
 	}
 }

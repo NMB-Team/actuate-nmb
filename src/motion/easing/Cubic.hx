@@ -42,7 +42,7 @@ class CubicEaseOut implements IEasing {
 		return --k * k * k + 1;
 	}
 
-	public function ease (t:Float, b:Float, c:Float, d:Float):Float {
+	public function ease(t:Float, b:Float, c:Float, d:Float):Float {
 		return c * ((t = t / d - 1) * t * t + 1) + b;
 	}
 }

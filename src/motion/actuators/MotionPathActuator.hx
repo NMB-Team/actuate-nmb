@@ -1,4 +1,4 @@
-﻿package motion.actuators;
+package motion.actuators;
 
 import motion.MotionPath;
 
@@ -10,8 +10,10 @@ class MotionPathActuator<T> extends SimpleActuator<T, T> {
 	override function apply():Void {
 		for (propertyName in Reflect.fields(properties)) {
 			#if (haxe_209 || haxe3)
-			if (Reflect.hasField(target, propertyName)) Reflect.setField(target, propertyName, cast(Reflect.field(properties, propertyName), IComponentPath).end);
-			else Reflect.setProperty(target, propertyName, cast(Reflect.field(properties, propertyName), IComponentPath).end);
+			if (Reflect.hasField(target, propertyName))
+				Reflect.setField(target, propertyName, cast(Reflect.field(properties, propertyName), IComponentPath).end);
+			else
+				Reflect.setProperty(target, propertyName, cast(Reflect.field(properties, propertyName), IComponentPath).end);
 			#else
 			Reflect.setField(target, propertyName, cast(Reflect.field(properties, propertyName), IComponentPath).end);
 			#end
@@ -58,14 +60,17 @@ class MotionPathActuator<T> extends SimpleActuator<T, T> {
 
 			var tweenPosition = (currentTime - timeOffset) / duration;
 
-			if (tweenPosition > 1) tweenPosition = 1;
-			if (!initialized) initialize();
+			if (tweenPosition > 1)
+				tweenPosition = 1;
+			if (!initialized)
+				initialize();
 
 			if (!special) {
 				easing = _ease.calculate(tweenPosition);
 
 				for (details in propertyDetails) {
-					if (details.isField) Reflect.setField(details.target, details.propertyName, cast(details, PropertyPathDetails<Dynamic>).path.calculate(easing));
+					if (details.isField)
+						Reflect.setField(details.target, details.propertyName, cast(details, PropertyPathDetails<Dynamic>).path.calculate(easing));
 					else {
 						#if (haxe_209 || haxe3)
 						Reflect.setProperty(details.target, details.propertyName, cast(details, PropertyPathDetails<Dynamic>).path.calculate(easing));
@@ -77,14 +82,16 @@ class MotionPathActuator<T> extends SimpleActuator<T, T> {
 
 				for (details in propertyDetails) {
 					if (!_snapping) {
-						if (details.isField) Reflect.setField(details.target, details.propertyName, cast(details, PropertyPathDetails<Dynamic>).path.calculate(easing));
+						if (details.isField)
+							Reflect.setField(details.target, details.propertyName, cast(details, PropertyPathDetails<Dynamic>).path.calculate(easing));
 						else {
 							#if (haxe_209 || haxe3)
 							Reflect.setProperty(details.target, details.propertyName, cast(details, PropertyPathDetails<Dynamic>).path.calculate(easing));
 							#end
 						}
 					} else {
-						if (details.isField) Reflect.setField(details.target, details.propertyName, Math.round(cast(details, PropertyPathDetails<Dynamic>).path.calculate(easing)));
+						if (details.isField)
+							Reflect.setField(details.target, details.propertyName, Math.round(cast(details, PropertyPathDetails<Dynamic>).path.calculate(easing)));
 						else {
 							#if (haxe_209 || haxe3)
 							Reflect.setProperty(details.target, details.propertyName, Math.round(cast(details, PropertyPathDetails<Dynamic>).path.calculate(easing)));
@@ -104,17 +111,21 @@ class MotionPathActuator<T> extends SimpleActuator<T, T> {
 					complete(true);
 					return;
 				} else {
-					if (_onRepeat != null) callMethod(_onRepeat, _onRepeatParams);
+					if (_onRepeat != null)
+						callMethod(_onRepeat, _onRepeatParams);
 
-					if (_reflect) _reverse = !_reverse;
+					if (_reflect)
+						_reverse = !_reverse;
 
 					startTime = currentTime;
 					timeOffset = startTime + _delay;
 
-					if (_repeat > 0) _repeat--;
+					if (_repeat > 0)
+						_repeat--;
 				}
 			}
-			if (sendChange) change();
+			if (sendChange)
+				change();
 		}
 	}
 }
@@ -126,7 +137,7 @@ import com.eclecticdesignstudio.motion.MotionPath;
 class PropertyPathDetails<T> extends PropertyDetails<T> {
 	public var path:IComponentPath;
 
-	public function new (target:T, propertyName:String, path:IComponentPath, isField = true) {
+	public function new(target:T, propertyName:String, path:IComponentPath, isField = true) {
 		super(target, propertyName, 0, 0, isField);
 		this.path = path;
 	}

@@ -1,4 +1,4 @@
-﻿package motion.actuators;
+package motion.actuators;
 
 #if openfl
 import openfl.display.DisplayObject;
@@ -17,7 +17,8 @@ class FilterActuator extends SimpleActuator<DisplayObject, BitmapFilter> {
 		if (Std.isOfType(properties.filter, Class)) {
 			filterClass = properties.filter;
 
-			if (target.filters.length == 0) target.filters = [Type.createInstance(filterClass, [])];
+			if (target.filters.length == 0)
+				target.filters = [Type.createInstance(filterClass, [])];
 
 			for (filter in target.filters)
 				if (Std.isOfType(filter, filterClass))
@@ -29,7 +30,7 @@ class FilterActuator extends SimpleActuator<DisplayObject, BitmapFilter> {
 	}
 
 	override function apply():Void {
-		for (propertyName in Reflect.fields (properties))
+		for (propertyName in Reflect.fields(properties))
 			if (propertyName != "filter")
 				Reflect.setProperty(filter, propertyName, Reflect.field(properties, propertyName));
 
@@ -40,10 +41,11 @@ class FilterActuator extends SimpleActuator<DisplayObject, BitmapFilter> {
 		var details:PropertyDetails<BitmapFilter>;
 		var start:Float;
 
-		for (propertyName in Reflect.fields (properties))
+		for (propertyName in Reflect.fields(properties))
 			if (propertyName != "filter") {
 				start = getField(filter, propertyName);
-				details = new PropertyDetails(filter, propertyName, start, Reflect.field (properties, propertyName) - start, Reflect.hasField (filter, "set_" + propertyName));
+				details = new PropertyDetails(filter, propertyName, start, Reflect.field(properties, propertyName)
+					- start, Reflect.hasField(filter, "set_" + propertyName));
 				propertyDetails.push(details);
 			}
 

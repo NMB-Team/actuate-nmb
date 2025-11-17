@@ -1,4 +1,4 @@
-﻿package motion;
+package motion;
 
 class MotionPath {
 	public var rotation(get, never):RotationPath;
@@ -11,10 +11,10 @@ class MotionPath {
 
 	#if commonjs
 	static function __init__() {
-		untyped Object.defineProperties (MotionPath.prototype, {
-			"rotation": {get: untyped __js__ ("function () { return this.get_rotation (); }")},
-			"x": {get: untyped __js__ ("function () { return this.get_x (); }")},
-			"y": {get: untyped __js__ ("function () { return this.get_y (); }")},
+		untyped Object.defineProperties(MotionPath.prototype, {
+			"rotation": {get: untyped __js__("function () { return this.get_rotation (); }")},
+			"x": {get: untyped __js__("function () { return this.get_x (); }")},
+			"y": {get: untyped __js__("function () { return this.get_y (); }")},
 		});
 	}
 	#end
@@ -121,14 +121,16 @@ class ComponentPath implements IComponentPath {
 
 	public function calculate(k:Float):Float {
 		if (paths.length == 1) {
-			return paths[0].calculate (k);
+			return paths[0].calculate(k);
 		} else {
 			var ratio = k * strength;
 
 			for (path in paths) {
 				// numerical issues bugfix
-				if (ratio - path.strength > 1e-7) ratio -= path.strength;
-				else return path.calculate (ratio / path.strength);
+				if (ratio - path.strength > 1e-7)
+					ratio -= path.strength;
+				else
+					return path.calculate(ratio / path.strength);
 			}
 		}
 
@@ -141,15 +143,18 @@ class ComponentPath implements IComponentPath {
 	}
 
 	public function set_start(value:Float):Float {
-		if (paths.length > 0) return paths[0].start = value;
-		else return 0;
+		if (paths.length > 0)
+			return paths[0].start = value;
+		else
+			return 0;
 	}
 
 	@:noCompletion function get_end():Float {
 		if (paths.length > 0) {
 			final path = paths[paths.length - 1];
 			return path.end;
-		} else return start;
+		} else
+			return start;
 	}
 }
 
@@ -181,13 +186,17 @@ class BezierPath implements IComponentPath {
 		var l = 1 - k;
 
 		switch (control.length) {
-			case 0: return l * _start + k * _end;
-			case 1: return l * l * _start + 2 * l * k * control[0] + k * k * _end;
-			case 2: return l * l * l * _start + 3 * l * l * k * control[0] + 3 * l * k * k * control[1] + k * k * k * _end;
+			case 0:
+				return l * _start + k * _end;
+			case 1:
+				return l * l * _start + 2 * l * k * control[0] + k * k * _end;
+			case 2:
+				return l * l * l * _start + 3 * l * l * k * control[0] + 3 * l * k * k * control[1] + k * k * k * _end;
 			default:
 				// General explicit form (https://en.wikipedia.org/wiki/B%C3%A9zier_curve#General_definition)
 				// To speed up we compute the coefficient (n i) l^(n-i) k^i from its previous value at every step.
-				if (l < 1e-7) return _end; // avoid numerical issues
+				if (l < 1e-7)
+					return _end; // avoid numerical issues
 
 				final r = k / l;
 				final n = control.length + 1; // degree
@@ -234,7 +243,7 @@ class BezierSplinePath extends ComponentPath {
 		Code from: https://www.particleincell.com/wp-content/uploads/2012/06/bezier-spline.js
 		Explanation: https://www.particleincell.com/2012/bezier-splines/
 		With correction from: https://www.jacos.nl/jacos_html/spline/
-	 **/
+	**/
 	private function computeControlPoints(start:Float):Array<Array<Float>> {
 		final K = [start].concat(through);
 		var n = K.length;
@@ -282,10 +291,11 @@ class BezierSplinePath extends ComponentPath {
 		}
 
 		// we have control[i][0], now compute control[i][1]
-		for (i in 0...n - 1) control[i][1] = 2 * K[i + 1] - control[i + 1][0];
+		for (i in 0...n - 1)
+			control[i][1] = 2 * K[i + 1] - control[i + 1][0];
 
-		control[n - 1][1] = .5 * (K[n] + control[n-1][0]);
-		control.pop();	// the last element is auxiliary for the computation
+		control[n - 1][1] = .5 * (K[n] + control[n - 1][0]);
+		control.pop(); // the last element is auxiliary for the computation
 
 		return control;
 	}
@@ -299,8 +309,8 @@ class BezierSplinePath extends ComponentPath {
 			final control = computeControlPoints(value);
 
 			final pathStrength = strength / control.length;
-			strength = 0;						// will be rewritten by addPath
-			paths.splice(0, paths.length);		// reset
+			strength = 0; // will be rewritten by addPath
+			paths.splice(0, paths.length); // reset
 
 			for (i in 0...control.length)
 				addPath(new BezierPath(through[i], control[i], pathStrength));

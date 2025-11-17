@@ -1,4 +1,4 @@
-﻿package motion.easing;
+package motion.easing;
 
 /**
  * @author Joshua Granick
@@ -26,7 +26,7 @@ class SineEaseInOut implements IEasing {
 	public function new() {}
 
 	public function calculate(k:Float):Float {
-		return - (Math.cos(Math.PI * k) - 1) * .5;
+		return -(Math.cos(Math.PI * k) - 1) * .5;
 	}
 
 	public function ease(t:Float, b:Float, c:Float, d:Float):Float {

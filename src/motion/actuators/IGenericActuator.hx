@@ -101,7 +101,7 @@ interface IGenericActuator {
 
 	public var timeScale(get, set):Float;
 
-	//private var properties:Dynamic;
+	// private var properties:Dynamic;
 	private function apply():Void;
 	private function move():Void;
 	private function pause():Void;

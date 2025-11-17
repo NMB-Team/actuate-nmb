@@ -1,7 +1,8 @@
-﻿package motion.actuators;
+package motion.actuators;
 
 #if openfl
 import Reflect;
+
 import openfl.display.DisplayObject;
 import openfl.geom.Matrix;
 import openfl.geom.Point;
@@ -32,9 +33,12 @@ class TransformAroundPointActuator<T, U> extends SimpleActuator<T, U> {
 			switch (propertyName) {
 				case "point":
 					final point = Reflect.field(transformAroundPointProps, "point");
-					final isLocal = Reflect.hasField(transformAroundPointProps, "pointIsLocal") && Reflect.field (transformAroundPointProps, "pointIsLocal");
-					if (Std.isOfType(target, DisplayObject) && !isLocal) transformPoint = Reflect.callMethod(target,  Reflect.field(target, "globalToLocal"), [point]);
-					else transformPoint = point;
+					final isLocal = Reflect.hasField(transformAroundPointProps, "pointIsLocal")
+						&& Reflect.field(transformAroundPointProps, "pointIsLocal");
+					if (Std.isOfType(target, DisplayObject) && !isLocal)
+						transformPoint = Reflect.callMethod(target, Reflect.field(target, "globalToLocal"), [point]);
+					else
+						transformPoint = point;
 				case "scale":
 					final value = Reflect.field(transformAroundPointProps, "scale");
 					Reflect.setField(properties, "scaleX", value);
@@ -59,8 +63,10 @@ class TransformAroundPointActuator<T, U> extends SimpleActuator<T, U> {
 			final value = Reflect.field(properties, propertyName);
 			setField(target, propertyName, value);
 
-			if (propertyName == "x") tweenedOffsetX = value - originX;
-			else if (propertyName == "y") tweenedOffsetY = value - originY;
+			if (propertyName == "x")
+				tweenedOffsetX = value - originX;
+			else if (propertyName == "y")
+				tweenedOffsetY = value - originY;
 		}
 
 		updatePosition();
@@ -69,15 +75,19 @@ class TransformAroundPointActuator<T, U> extends SimpleActuator<T, U> {
 	override function setProperty(details:PropertyDetails<U>, value:Dynamic):Void {
 		final propertyName = details.propertyName;
 
-		if (propertyName == "x") tweenedOffsetX = value - originX;
-		else if (propertyName == "y") tweenedOffsetY = value - originY;
-		else super.setProperty(details, value);
+		if (propertyName == "x")
+			tweenedOffsetX = value - originX;
+		else if (propertyName == "y")
+			tweenedOffsetY = value - originY;
+		else
+			super.setProperty(details, value);
 	}
 
 	override function update(elapsed:Float):Void {
 		super.update(elapsed);
 
-		if (active && !paused) updatePosition();
+		if (active && !paused)
+			updatePosition();
 	}
 
 	inline function getTransformedPoint(result:Point):Void {
@@ -100,7 +110,7 @@ class TransformAroundPointActuator<T, U> extends SimpleActuator<T, U> {
 		setField(target, "y", originY + transformedPoint.y + tweenedOffsetY);
 	}
 
-	inline function transform(point:Point, matrix: Matrix):Void {
+	inline function transform(point:Point, matrix:Matrix):Void {
 		final px = point.x;
 		final py = point.y;
 
@@ -109,7 +119,8 @@ class TransformAroundPointActuator<T, U> extends SimpleActuator<T, U> {
 	}
 
 	inline function subtract(p1:Point, p2:Point, ?result:Point):Point {
-		if (result == null) result = new Point();
+		if (result == null)
+			result = new Point();
 
 		result.x = p1.x - p2.x;
 		result.y = p1.y - p2.y;

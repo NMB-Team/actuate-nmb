@@ -1,7 +1,7 @@
-﻿package motion.actuators;
-
+package motion.actuators;
 
 import motion.actuators.GenericActuator;
+
 #if openfl
 import openfl.display.DisplayObject;
 import openfl.events.Event;
@@ -48,15 +48,15 @@ class SimpleActuator<T, U> extends GenericActuator<T> {
 		sendChange = paused = cacheVisible = initialized = setVisible = toggleVisible = false;
 
 		#if !actuate_manual_time
-			#if openfl
-			startTime = Lib.getTimer() * .001;
-			#elseif lime
-			startTime = System.getTimer() * .001;
-			#elseif js
-			startTime = Browser.window.performance.now() * .001;
-			#else
-			startTime = Timer.stamp();
-			#end
+		#if openfl
+		startTime = Lib.getTimer() * .001;
+		#elseif lime
+		startTime = System.getTimer() * .001;
+		#elseif js
+		startTime = Browser.window.performance.now() * .001;
+		#else
+		startTime = Timer.stamp();
+		#end
 		#else
 		startTime = getTime();
 		#end
@@ -66,35 +66,35 @@ class SimpleActuator<T, U> extends GenericActuator<T> {
 		if (!addedEvent) {
 			addedEvent = true;
 			#if !actuate_manual_update
-				#if openfl
-				Lib.current.stage.addEventListener(Event.ENTER_FRAME, stage_onEnterFrame);
-				#elseif lime
-				Application.current.onUpdate.add(stage_onEnterFrame);
-				#elseif js
-				Browser.window.requestAnimationFrame(stage_onEnterFrame);
-				#else
-				timer = new Timer(Std.int(1000 / 30));
-				timer.run = stage_onEnterFrame;
-				#end
+			#if openfl
+			Lib.current.stage.addEventListener(Event.ENTER_FRAME, stage_onEnterFrame);
+			#elseif lime
+			Application.current.onUpdate.add(stage_onEnterFrame);
+			#elseif js
+			Browser.window.requestAnimationFrame(stage_onEnterFrame);
+			#else
+			timer = new Timer(Std.int(1000 / 30));
+			timer.run = stage_onEnterFrame;
+			#end
 			#end
 		}
 	}
 
-	//For instant transition to start state without shaking
+	// For instant transition to start state without shaking
 	override function reverse(?value:Null<Bool>):GenericActuator<T> {
 		final ga = super.reverse(value);
 
 		var startTime = .0;
 		#if !actuate_manual_time
-			#if openfl
-			startTime = Lib.getTimer() * .001;
-			#elseif lime
-			startTime = System.getTimer() * .001;
-			#elseif js
-			startTime = Browser.window.performance.now() * .001;
-			#else
-			startTime = Timer.stamp();
-			#end
+		#if openfl
+		startTime = Lib.getTimer() * .001;
+		#elseif lime
+		startTime = System.getTimer() * .001;
+		#elseif js
+		startTime = Browser.window.performance.now() * .001;
+		#else
+		startTime = Timer.stamp();
+		#end
 		#else
 		startTime = getTime();
 		#end
@@ -110,7 +110,7 @@ class SimpleActuator<T, U> extends GenericActuator<T> {
 	override function apply():Void {
 		super.apply();
 
-		if (toggleVisible && Reflect.hasField (properties, "alpha")) {
+		if (toggleVisible && Reflect.hasField(properties, "alpha")) {
 			if (getField(target, "visible") != null)
 				setField(target, "visible", Reflect.field(properties, "alpha") > 0);
 		}
@@ -120,13 +120,15 @@ class SimpleActuator<T, U> extends GenericActuator<T> {
 	 * @inheritDoc
 	 */
 	override function autoVisible(?value:Null<Bool>):GenericActuator<T> {
-		if (value == null) value = true;
+		if (value == null)
+			value = true;
 
 		_autoVisible = value;
 
 		if (!value) {
 			toggleVisible = false;
-			if (setVisible) setField(target, "visible", cacheVisible);
+			if (setVisible)
+				setField(target, "visible", cacheVisible);
 		}
 
 		return this;
@@ -159,7 +161,8 @@ class SimpleActuator<T, U> extends GenericActuator<T> {
 
 			#if (haxe_209 || haxe3)
 			#if !hl
-			if (Reflect.hasField(target, i) #if js && !(untyped(target).__properties__ && untyped(target).__properties__["set_" + i]) #end)
+			if (Reflect.hasField(target, i) #if js
+				&& !(untyped (target).__properties__ && untyped (target).__properties__["set_" + i]) #end)
 				start = Reflect.field(target, i);
 			else
 			#end
@@ -175,8 +178,10 @@ class SimpleActuator<T, U> extends GenericActuator<T> {
 				var value:Dynamic = getField(properties, i);
 
 				#if js
-				if (start == null) start = 0;
-				if (value == null) value = 0;
+				if (start == null)
+					start = 0;
+				if (value == null)
+					value = 0;
 				#end
 
 				details = new PropertyDetails(cast target, i, start, value - start, isField);
@@ -209,11 +214,13 @@ class SimpleActuator<T, U> extends GenericActuator<T> {
 	/**
 	 * @inheritDoc
 	 */
-	public override function onUpdate(handler:Dynamic, parameters:Array <Dynamic> = null):GenericActuator<T> {
+	public override function onUpdate(handler:Dynamic, parameters:Array<Dynamic> = null):GenericActuator<T> {
 		_onUpdate = handler;
 
-		if (parameters == null) _onUpdateParams = [];
-		else _onUpdateParams = parameters;
+		if (parameters == null)
+			_onUpdateParams = [];
+		else
+			_onUpdateParams = parameters;
 
 		sendChange = true;
 
@@ -227,15 +234,15 @@ class SimpleActuator<T, U> extends GenericActuator<T> {
 			super.pause();
 
 			#if !actuate_manual_time
-				#if openfl
-				pauseTime = Lib.getTimer();
-				#elseif lime
-				pauseTime = System.getTimer();
-				#elseif js
-				pauseTime = Browser.window.performance.now();
-				#else
-				pauseTime = Timer.stamp();
-				#end
+			#if openfl
+			pauseTime = Lib.getTimer();
+			#elseif lime
+			pauseTime = System.getTimer();
+			#elseif js
+			pauseTime = Browser.window.performance.now();
+			#else
+			pauseTime = Timer.stamp();
+			#end
 			#else
 			pauseTime = getTime();
 			#end
@@ -247,15 +254,15 @@ class SimpleActuator<T, U> extends GenericActuator<T> {
 			paused = false;
 
 			#if !actuate_manual_time
-				#if openfl
-				timeOffset += (Lib.getTimer() - pauseTime) * .001;
-				#elseif lime
-				timeOffset += (System.getTimer() - pauseTime) * .001;
-				#elseif js
-				timeOffset += (Browser.window.performance.now() - pauseTime) * .001;
-				#else
-				timeOffset += (Timer.stamp() - pauseTime);
-				#end
+			#if openfl
+			timeOffset += (Lib.getTimer() - pauseTime) * .001;
+			#elseif lime
+			timeOffset += (System.getTimer() - pauseTime) * .001;
+			#elseif js
+			timeOffset += (Browser.window.performance.now() - pauseTime) * .001;
+			#else
+			timeOffset += (Timer.stamp() - pauseTime);
+			#end
 			#else
 			timeOffset += (getTime() - pauseTime);
 			#end
@@ -264,9 +271,9 @@ class SimpleActuator<T, U> extends GenericActuator<T> {
 		}
 	}
 
-
 	#if !js @:generic #end inline function setField<V>(target:V, propertyName:String, value:Dynamic):Void {
-		if (Reflect.hasField(target, propertyName) #if js && !(untyped (target).__properties__ && untyped(target).__properties__["set_" + propertyName]) #end) {
+		if (Reflect.hasField(target, propertyName) #if js
+			&& !(untyped (target).__properties__ && untyped (target).__properties__["set_" + propertyName]) #end) {
 			Reflect.setField(target, propertyName, value);
 		}
 		#if (haxe_209 || haxe3)
@@ -292,7 +299,8 @@ class SimpleActuator<T, U> extends GenericActuator<T> {
 			if (properties == null) {
 				active = false;
 
-				if (complete) apply();
+				if (complete)
+					apply();
 
 				this.complete(sendEvent);
 				return;
@@ -302,7 +310,8 @@ class SimpleActuator<T, U> extends GenericActuator<T> {
 				if (Reflect.hasField(this.properties, i)) {
 					active = false;
 
-					if (complete) apply();
+					if (complete)
+						apply();
 
 					this.complete(sendEvent);
 					return;
@@ -318,8 +327,10 @@ class SimpleActuator<T, U> extends GenericActuator<T> {
 
 			var tweenPosition = (currentTime - timeOffset) * _timeScale / duration;
 
-			if (tweenPosition > 1) tweenPosition = 1;
-			if (!initialized) initialize();
+			if (tweenPosition > 1)
+				tweenPosition = 1;
+			if (!initialized)
+				initialize();
 
 			if (!special) {
 				easing = _ease.calculate(tweenPosition);
@@ -336,17 +347,23 @@ class SimpleActuator<T, U> extends GenericActuator<T> {
 				for (i in 0...detailsLength) {
 					details = propertyDetails[i];
 
-					if (_smartRotation && (details.propertyName == "rotation" || details.propertyName == "rotationX" || details.propertyName == "rotationY" || details.propertyName == "rotationZ")) {
+					if (_smartRotation
+						&& (details.propertyName == "rotation" || details.propertyName == "rotationX" || details.propertyName == "rotationY" || details.propertyName == "rotationZ")) {
 						var rotation = details.change % 360;
 
-						if (rotation > 180) rotation -= 360;
-						else if (rotation < -180) rotation += 360;
+						if (rotation > 180)
+							rotation -= 360;
+						else if (rotation < -180)
+							rotation += 360;
 
 						endValue = details.start + rotation * easing;
-					} else endValue = details.start + (details.change * easing);
+					} else
+						endValue = details.start + (details.change * easing);
 
-					if (!_snapping) setProperty(details, endValue);
-					else setProperty(details, Math.round(endValue));
+					if (!_snapping)
+						setProperty(details, endValue);
+					else
+						setProperty(details, Math.round(endValue));
 				}
 			}
 
@@ -360,35 +377,39 @@ class SimpleActuator<T, U> extends GenericActuator<T> {
 					complete(true);
 					return;
 				} else {
-					if (_onRepeat != null) callMethod(_onRepeat, _onRepeatParams);
+					if (_onRepeat != null)
+						callMethod(_onRepeat, _onRepeatParams);
 
-					if (_reflect) _reverse = !_reverse;
+					if (_reflect)
+						_reverse = !_reverse;
 
 					startTime = currentTime;
 					timeOffset = startTime + _delay;
 
-					if (_repeat > 0) _repeat--;
+					if (_repeat > 0)
+						_repeat--;
 				}
 			}
 
-			if (sendChange) change();
+			if (sendChange)
+				change();
 		}
 	}
 
 	// Event Handlers
 	#if actuate_manual_update public #end static function stage_onEnterFrame(#if openfl event:Event #elseif lime deltaTime:Float #elseif js deltaTime:Float #end):Void {
 		#if !actuate_manual_time
-			#if openfl
-			final currentTime = Lib.getTimer() * .001;
-			#elseif lime
-			final currentTime = System.getTimer() * .001;
-			#elseif js
-			final currentTime = deltaTime * .001;
-			#else
-			final currentTime = Timer.stamp();
-			#end
+		#if openfl
+		final currentTime = Lib.getTimer() * .001;
+		#elseif lime
+		final currentTime = System.getTimer() * .001;
+		#elseif js
+		final currentTime = deltaTime * .001;
 		#else
-			final currentTime = getTime();
+		final currentTime = Timer.stamp();
+		#end
+		#else
+		final currentTime = getTime();
 		#end
 
 		var actuator:SimpleActuator<Dynamic, Dynamic>;
@@ -415,7 +436,6 @@ class SimpleActuator<T, U> extends GenericActuator<T> {
 }
 
 #if (cpp && (!openfl && !lime))
-
 // Custom haxe.Timer implementation for C++
 typedef TimerList = Array<Timer>;
 
@@ -428,7 +448,7 @@ class Timer {
 
 	public function new(time:Float) {
 		mTime = time;
-		sRunningTimers.push (this);
+		sRunningTimers.push(this);
 		mFireAt = GetMS() + mTime;
 		mRunning = true;
 	}
@@ -440,7 +460,7 @@ class Timer {
 		return r;
 	}
 
-	dynamic public function run () {} // Set this with "run=..."
+	dynamic public function run() {} // Set this with "run=..."
 
 	public function stop():Void {
 		if (mRunning) {
@@ -453,7 +473,7 @@ class Timer {
 		return stamp() * 1000;
 	}
 
-  	// From std/haxe/Timer.hx
+	// From std/haxe/Timer.hx
 	public static function delay(f:Void -> Void, time:Int) {
 		final t = new Timer(time);
 
